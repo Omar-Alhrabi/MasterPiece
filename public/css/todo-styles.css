@@ -1,0 +1,77 @@
+/* Todo List Styles */
+.todo-item {
+    transition: all 0.3s ease;
+    border-radius: 0.25rem;
+    background-color: #fff;
+}
+
+.todo-item:hover {
+    background-color: #f8f9fc;
+    transform: translateX(2px);
+}
+
+.todo-item .form-check {
+    flex-grow: 1;
+}
+
+.todo-item .form-check-input {
+    cursor: pointer;
+}
+
+.todo-item .form-check-label {
+    cursor: pointer;
+    color: #3a3b45;
+    font-weight: 500;
+    margin-bottom: 0;
+    transition: all 0.2s ease;
+}
+
+.todo-item .form-check-input:checked + .form-check-label {
+    text-decoration: line-through;
+    color: #b7b9cc;
+}
+
+.todo-item.opacity-50 {
+    opacity: 0.5;
+}
+
+.todo-item .badge {
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+}
+
+.todo-item .badge-success {
+    background-color: #1cc88a;
+}
+
+.todo-item .badge-info {
+    background-color: #36b9cc;
+}
+
+.todo-item .badge-danger {
+    background-color: #e74a3b;
+}
+
+.todo-item .badge-warning {
+    background-color: #f6c23e;
+}
+
+/* Form styles in modal */
+#addTaskForm .form-control:focus {
+    border-color: #4e73df;
+    box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+}
+
+/* Dropdown menu styles */
+.dropdown-menu {
+    box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+}
+
+.dropdown-item {
+    transition: all 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background-color: #4e73df;
+    color: #fff;
+}
