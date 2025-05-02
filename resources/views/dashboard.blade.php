@@ -6,11 +6,62 @@
     <!-- Page Heading -->
     <div class="d-sm-flex align-items-center justify-content-between mb-4">
         <h1 class="h3 mb-0 text-gray-800">Dashboard</h1>
-        @if(Auth::user()->isAdmin())
-        <a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm">
-            <i class="fas fa-download fa-sm text-white-50"></i> Generate Report
-        </a>
-        @endif
+      @if(Auth::user()->isAdmin())
+<a href="#" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm" data-toggle="modal" data-target="#reportModal">
+    <i class="fas fa-download fa-sm text-white-50"></i> Generate Report
+</a>
+
+<!-- Report Modal -->
+    <div class="modal fade" id="reportModal" tabindex="-1" role="dialog" aria-labelledby="reportModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="reportModalLabel">Generate Monthly Report</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <form action="{{ route('report.generate') }}" method="GET">
+                    <div class="modal-body">
+                        <div class="form-group">
+                            <label for="report_month">Month</label>
+                            <select class="form-control" id="report_month" name="month" required>
+                                <option value="1" {{ date('n') == 1 ? 'selected' : '' }}>January</option>
+                                <option value="2" {{ date('n') == 2 ? 'selected' : '' }}>February</option>
+                                <option value="3" {{ date('n') == 3 ? 'selected' : '' }}>March</option>
+                                <option value="4" {{ date('n') == 4 ? 'selected' : '' }}>April</option>
+                                <option value="5" {{ date('n') == 5 ? 'selected' : '' }}>May</option>
+                                <option value="6" {{ date('n') == 6 ? 'selected' : '' }}>June</option>
+                                <option value="7" {{ date('n') == 7 ? 'selected' : '' }}>July</option>
+                                <option value="8" {{ date('n') == 8 ? 'selected' : '' }}>August</option>
+                                <option value="9" {{ date('n') == 9 ? 'selected' : '' }}>September</option>
+                                <option value="10" {{ date('n') == 10 ? 'selected' : '' }}>October</option>
+                                <option value="11" {{ date('n') == 11 ? 'selected' : '' }}>November</option>
+                                <option value="12" {{ date('n') == 12 ? 'selected' : '' }}>December</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="report_year">Year</label>
+                            <select class="form-control" id="report_year" name="year" required>
+                                @php
+                                    $currentYear = date('Y');
+                                    $startYear = $currentYear - 5;
+                                @endphp
+                                @for($year = $currentYear; $year >= $startYear; $year--)
+                                    <option value="{{ $year }}" {{ $year == $currentYear ? 'selected' : '' }}>{{ $year }}</option>
+                                @endfor
+                            </select>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                        <button type="submit" class="btn btn-primary">Generate Report</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    @endif
     </div>
 
     @if(Auth::user()->isAdmin())

@@ -81,6 +81,54 @@
                                 </div>
                             </div>
                             
+                            <!-- Break Feature -->
+                            <div class="card bg-light mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Breaks</h5>
+                                    <div id="break-tracker">
+                                        @if(!$attendance->break_start && !$attendance->break_end)
+                                            <p class="text-muted mb-3">No break has been recorded yet.</p>
+                                            <form action="{{ route('attendance.break-start') }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-info">
+                                                    <i class="fas fa-coffee mr-2"></i> Start Break
+                                                </button>
+                                            </form>
+                                        @elseif($attendance->break_start && !$attendance->break_end)
+                                            <p class="text-warning mb-3">You are currently on break (started at {{ date('h:i A', strtotime($attendance->break_start)) }})</p>
+                                            <div id="break-duration" class="h5 mb-3">
+                                                <!-- Will be updated by JavaScript -->
+                                                00:00:00
+                                            </div>
+                                            <form action="{{ route('attendance.break-end') }}" method="POST">
+                                                @csrf
+                                                <button type="submit" class="btn btn-warning">
+                                                    <i class="fas fa-undo mr-2"></i> End Break
+                                                </button>
+                                            </form>
+                                        @else
+                                            <p class="text-success">Break taken: {{ date('h:i A', strtotime($attendance->break_start)) }} - {{ date('h:i A', strtotime($attendance->break_end)) }}</p>
+                                            @php
+                                                $breakStart = \Carbon\Carbon::parse($attendance->break_start);
+                                                $breakEnd = \Carbon\Carbon::parse($attendance->break_end);
+                                                $breakDuration = $breakEnd->diff($breakStart);
+                                                $breakTimeFormatted = sprintf('%02d:%02d:%02d', $breakDuration->h, $breakDuration->i, $breakDuration->s);
+                                            @endphp
+                                            <p>Duration: {{ $breakTimeFormatted }}</p>
+                                            
+                                            @if(!$attendance->multiple_breaks)
+                                            <form action="{{ route('attendance.break-start') }}" method="POST" class="mt-3">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-info">
+                                                    <i class="fas fa-coffee mr-2"></i> Take Another Break
+                                                </button>
+                                            </form>
+                                            @endif
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                            
                             <form action="{{ route('attendance.check-out') }}" method="POST">
                                 @csrf
                                 <div class="form-group">
@@ -136,6 +184,31 @@
                                     </p>
                                 </div>
                             </div>
+                            
+                            <!-- Break Information -->
+                            @if($attendance->break_start)
+                            <div class="card bg-light mb-4">
+                                <div class="card-body">
+                                    <h5 class="card-title">Breaks</h5>
+                                    <p class="card-text">
+                                        @if($attendance->break_start && $attendance->break_end)
+                                            <strong>Break:</strong> {{ date('h:i A', strtotime($attendance->break_start)) }} - {{ date('h:i A', strtotime($attendance->break_end)) }}
+                                            @php
+                                                $breakStart = \Carbon\Carbon::parse($attendance->break_start);
+                                                $breakEnd = \Carbon\Carbon::parse($attendance->break_end);
+                                                $breakDuration = $breakEnd->diff($breakStart);
+                                                $breakTimeFormatted = sprintf('%02d:%02d:%02d', $breakDuration->h, $breakDuration->i, $breakDuration->s);
+                                            @endphp
+                                            <br><strong>Break Duration:</strong> {{ $breakTimeFormatted }}
+                                        @endif
+                                        
+                                        @if($attendance->breaks)
+                                            <br><strong>Additional Breaks:</strong> {{ $attendance->breaks }}
+                                        @endif
+                                    </p>
+                                </div>
+                            </div>
+                            @endif
                             
                             @if($attendance->note)
                             <div class="card bg-light mb-4">
@@ -206,6 +279,26 @@
             
             var durationString = durationHours + ':' + durationMinutes + ':' + durationSeconds;
             document.getElementById('duration').textContent = durationString;
+            
+            // Update break duration if on break
+            @if($attendance->break_start && !$attendance->break_end)
+                var breakStartTime = new Date('{{ $attendance->break_start }}').getTime();
+                var breakDiff = currentTime - breakStartTime;
+                
+                var breakHours = Math.floor(breakDiff / (1000 * 60 * 60));
+                breakDiff -= breakHours * (1000 * 60 * 60);
+                var breakMinutes = Math.floor(breakDiff / (1000 * 60));
+                breakDiff -= breakMinutes * (1000 * 60);
+                var breakSeconds = Math.floor(breakDiff / 1000);
+                
+                // Format break duration
+                breakHours = breakHours < 10 ? '0' + breakHours : breakHours;
+                breakMinutes = breakMinutes < 10 ? '0' + breakMinutes : breakMinutes;
+                breakSeconds = breakSeconds < 10 ? '0' + breakSeconds : breakSeconds;
+                
+                var breakDurationString = breakHours + ':' + breakMinutes + ':' + breakSeconds;
+                document.getElementById('break-duration').textContent = breakDurationString;
+            @endif
         @endif
     }
     

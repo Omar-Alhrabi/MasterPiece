@@ -17,14 +17,14 @@ class RouteServiceProvider extends ServiceProvider
      *
      * @var string
      */
-    public const HOME = '/dashboard'; // أو أي مسار ترغب فيه مثل '/home'
+    public const HOME = '/dashboard'; 
 
     /**
      * Define your route model bindings, pattern filters, and other route configuration.
      */
     public function boot(): void
     {
-        // باقي التعريفات...
+        
         
         $this->routes(function () {
             Route::middleware('api')

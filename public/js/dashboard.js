@@ -38,6 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
         Chart.defaults.global.tooltips.caretPadding = 10;
         Chart.defaults.global.legend.display = false;
         Chart.defaults.global.maintainAspectRatio = false;
+        Chart.defaults.global.responsive = true; // Add responsive setting
     }
 
     // Check for admin user and initialize admin charts
@@ -221,9 +222,24 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     }
-}); // Earnings Chart for Admin
-var earningsChart = document.getElementById('earningsAreaChart');
-if (earningsChart) {
+
+    // Function to initialize Earnings Chart for Admin
+    function initEarningsChart(chartElement) {
+        const ctx = chartElement.getContext('2d');
+        
+        // Get earnings data from the data attribute if available, or use default data
+        let earningsData = [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000];
+        
+        // Try to get data from a data attribute if it exists
+        const dataContainer = document.getElementById('earnings-data');
+        if (dataContainer && dataContainer.dataset.values) {
+            try {
+                earningsData = JSON.parse(dataContainer.dataset.values);
+            } catch (e) {
+                console.error('Error parsing earnings data:', e);
+            }
+        }
+        
         new Chart(ctx, {
             type: 'line',
             data: {
@@ -241,10 +257,12 @@ if (earningsChart) {
                     pointHoverBorderColor: "rgba(78, 115, 223, 1)",
                     pointHitRadius: 10,
                     pointBorderWidth: 2,
-                    data: {!! json_encode($earningsData ?? [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000]) !!},
+                    data: earningsData,
                 }],
             },
             options: {
+                maintainAspectRatio: false,
+                responsive: true,
                 layout: {
                     padding: {
                         left: 10,
@@ -284,8 +302,19 @@ if (earningsChart) {
                     }],
                 },
                 tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
                     intersect: false,
                     mode: 'index',
+                    caretPadding: 10,
                     callbacks: {
                         label: function(tooltipItem, chart) {
                             return 'Earnings: $' + number_format(tooltipItem.yLabel);
@@ -331,8 +360,18 @@ if (earningsChart) {
                 }],
             },
             options: {
+                maintainAspectRatio: false,
+                responsive: true,
                 cutoutPercentage: 80,
                 tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
                     callbacks: {
                         label: function(tooltipItem, data) {
                             const label = data.labels[tooltipItem.index];
@@ -385,6 +424,8 @@ if (earningsChart) {
                 }],
             },
             options: {
+                maintainAspectRatio: false,
+                responsive: true,
                 scales: {
                     xAxes: [{
                         gridLines: {
@@ -416,6 +457,17 @@ if (earningsChart) {
                     }],
                 },
                 tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
                     callbacks: {
                         label: function(tooltipItem, chart) {
                             return 'Staff: ' + tooltipItem.yLabel;
@@ -483,6 +535,8 @@ if (earningsChart) {
                 }],
             },
             options: {
+                maintainAspectRatio: false,
+                responsive: true,
                 scales: {
                     xAxes: [{
                         gridLines: {
@@ -512,6 +566,17 @@ if (earningsChart) {
                     }],
                 },
                 tooltips: {
+                    backgroundColor: "rgb(255,255,255)",
+                    bodyFontColor: "#858796",
+                    titleMarginBottom: 10,
+                    titleFontColor: '#6e707e',
+                    titleFontSize: 14,
+                    borderColor: '#dddfeb',
+                    borderWidth: 1,
+                    xPadding: 15,
+                    yPadding: 15,
+                    displayColors: false,
+                    caretPadding: 10,
                     callbacks: {
                         label: function(tooltipItem, chart) {
                             return tooltipItem.yLabel + ' tasks completed';
@@ -521,3 +586,4 @@ if (earningsChart) {
             }
         });
     }
+});

@@ -71,11 +71,23 @@ Route::middleware(['auth'])->group(function () {
     })->name('tasks.complete');
     
     // Attendance management
-    Route::get('/attendance/record', [AttendanceController::class, 'record'])->name('attendance.record');
-    Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn'])->name('attendance.check-in');
-    Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut'])->name('attendance.check-out');
-    Route::get('/attendance/reports', [AttendanceController::class, 'reports'])->name('attendance.reports');
-    Route::resource('attendance', AttendanceController::class);
+    Route::prefix('attendance')->name('attendance.')->group(function () {
+        Route::get('/', [AttendanceController::class, 'index'])->name('index');
+        Route::get('/record', [AttendanceController::class, 'record'])->name('record');
+        Route::post('/check-in', [AttendanceController::class, 'checkIn'])->name('check-in');
+        Route::post('/check-out', [AttendanceController::class, 'checkOut'])->name('check-out');
+        Route::get('/reports', [AttendanceController::class, 'reports'])->name('reports');
+        Route::get('/create', [AttendanceController::class, 'create'])->name('create');
+        Route::post('/store', [AttendanceController::class, 'store'])->name('store');
+        Route::get('/edit/{attendance}', [AttendanceController::class, 'edit'])->name('edit');
+        Route::put('/update/{attendance}', [AttendanceController::class, 'update'])->name('update');
+        Route::delete('/destroy/{attendance}', [AttendanceController::class, 'destroy'])->name('destroy');
+        Route::get('/get-summary', [AttendanceController::class, 'getSummary'])->name('get-summary');
+        
+        // New Break Routes
+        Route::post('/break-start', [AttendanceController::class, 'breakStart'])->name('break-start');
+        Route::post('/break-end', [AttendanceController::class, 'breakEnd'])->name('break-end');
+    });
     
     // Leave management
     Route::get('/leaves/requests', [LeaveController::class, 'requests'])->name('leaves.requests');
@@ -145,6 +157,8 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/notifications/send', [App\Http\Controllers\AdminNotificationController::class, 'send'])->name('notifications.send');
     });
 
+    Route::get('/report/generate', [App\Http\Controllers\DashboardController::class, 'generateReport'])->name('report.generate');
+    
     Route::middleware(['auth'])->group(function () {
         // Main messaging routes
         Route::prefix('messages')->name('messages.')->group(function () {

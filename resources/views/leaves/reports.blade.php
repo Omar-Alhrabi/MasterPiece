@@ -228,7 +228,7 @@
         </div>
     </div>
 
-    <!-- Leave Type Distribution Chart -->
+    <!-- Leave Type Distribution Chart 
     <div class="row">
         <div class="col-xl-6 col-lg-6">
             <div class="card shadow mb-4">
@@ -254,8 +254,8 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
+        </div> 
+    </div>-->
 @endsection
 
 @push('styles')
@@ -326,7 +326,7 @@
             leaveStatuses['{{ $leave->status }}']++;
         @endforeach
         
-        // Leave Type Chart
+       /* // Leave Type Chart
         var typeLabels = Object.keys(leaveTypes);
         var typeData = Object.values(leaveTypes);
         var typeColors = generateRandomColors(typeLabels.length);
@@ -364,7 +364,7 @@
             },
         });
         
-        // Leave Status Chart
+         Leave Status Chart
         var statusLabels = Object.keys(leaveStatuses);
         var statusData = Object.values(leaveStatuses);
         var statusColors = ['#f6c23e', '#1cc88a', '#e74a3b', '#858796'];
@@ -401,7 +401,7 @@
                 cutoutPercentage: 80,
             },
         });
-        @endif
+        @endif */
         
         // Helper function to generate random colors
         function generateRandomColors(count) {

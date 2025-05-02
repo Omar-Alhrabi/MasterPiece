@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -7,10 +8,10 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <link rel="icon" href="{{ asset('image/favicon.png') }}" type="image/png" >
-        
+    <link rel="icon" href="{{ asset('image/favicon.png') }}" type="image/png">
+
     <title>{{ config('app.name', 'HR MS') }} - @yield('title')</title>
-    
+
     <!-- Custom fonts for this template-->
     <link href="{{ asset('vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
@@ -18,7 +19,7 @@
 
     <!-- Custom styles for this template-->
     <link href="{{ asset('css/sb-admin-2.min.css') }}" rel="stylesheet">
-    
+
     @stack('styles')
 </head>
 
@@ -182,7 +183,7 @@
                         @if(Auth::user()->isAdmin())
                         <a class="collapse-item {{ request()->routeIs('leaves.reports') ? 'active' : '' }}" href="{{ route('leaves.reports') }}">Leave Reports</a>
                         <a class="collapse-item {{ request()->routeIs('leaves.approve') ? 'active' : '' }}" href="{{ route('leaves.approve') }}">Approval of Leave</a>
-                        @endif  
+                        @endif
                     </div>
                 </div>
             </li>
@@ -233,7 +234,7 @@
                 </a>
             </li>
             <!-- permissions Management -->
-        <!--     <li class="nav-item {{ request()->routeIs('permissions.*') ? 'active' : '' }}">
+            <!--     <li class="nav-item {{ request()->routeIs('permissions.*') ? 'active' : '' }}">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePermissions"
                     aria-expanded="{{ request()->routeIs('permissions.*') ? 'true' : 'false' }}" aria-controls="collapsePermissions">
                     <i class="fas fa-fw fa-lock"></i>
@@ -256,9 +257,9 @@
                     <span>Send Notifications</span>
                 </a>
             </li>
-            @endif  
+            @endif
             <!-- Nav Item - Activities -->
-           <!--  <li class="nav-item {{ request()->routeIs('activities') ? 'active' : '' }}">
+            <!--  <li class="nav-item {{ request()->routeIs('activities') ? 'active' : '' }}">
                 <a class="nav-link" href="{{ route('activities') }}">
                     <i class="fa-solid fa-chart-line"></i>
                     <span>Activities</span>
@@ -274,7 +275,7 @@
 
                 </a>
             </li>
-            
+
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
@@ -299,7 +300,7 @@
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
                     </button>
-                    
+
                     <div class="text-center d-none d-md-inline">
                         <button class="rounded-circle border-0" id="sidebarToggle"><i class="fa-solid fa-list"></i></button>
                     </div>
@@ -361,7 +362,7 @@
                         <li class="nav-item dropdown no-arrow mx-1">
                             <a class="nav-link dropdown-toggle" href="#" id="alertsDropdown" role="button"
                                 data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                             <i class="fas fa-bell fa-fw"></i>
+                                <i class="fas fa-bell fa-fw"></i>
                                 <!-- Counter - Alerts -->
                                 <span class="badge badge-danger badge-counter">{{ auth()->user()->unreadNotifications->count() > 0 ? (auth()->user()->unreadNotifications->count() > 99 ? '99+' : auth()->user()->unreadNotifications->count()) : '' }}</span>
                             </a>
@@ -372,61 +373,62 @@
                                     Alerts Center
                                 </h6>
                                 @forelse(auth()->user()->notifications->take(10) as $notification)
-                                    <a class="dropdown-item d-flex align-items-center {{ $notification->read_at ? '' : 'bg-light' }}" href="{{ route('notifications.markAsRead', $notification->id) }}">
-                                        <div class="mr-3">
-                                            <div class="icon-circle bg-{{ $notification->read_at ? 'secondary' : 'primary' }}">
-                                                <i class="fas fa-{{ $notification->data['icon'] ?? 'bell' }} text-white"></i>
-                                            </div>
+                                <a class="dropdown-item d-flex align-items-center {{ $notification->read_at ? '' : 'bg-light' }}" href="{{ route('notifications.markAsRead', $notification->id) }}">
+                                    <div class="mr-3">
+                                        <div class="icon-circle bg-{{ $notification->read_at ? 'secondary' : 'primary' }}">
+                                            <i class="fas fa-{{ $notification->data['icon'] ?? 'bell' }} text-white"></i>
                                         </div>
-                                        <div>
-                                            <div class="small text-gray-500">{{ $notification->created_at->format('F d, Y') }}</div>
-                                            <span class="{{ $notification->read_at ? '' : 'font-weight-bold' }}">
-                                                @if(isset($notification->data['message']))
-                                                    {{ $notification->data['message'] }}
-                                                @elseif(isset($notification->data['title']))
-                                                    {{ $notification->data['title'] }}
-                                                @else
-                                                    New notification
-                                                @endif
-                                            </span>                                        </div>
-                                    </a>
-                                @empty
-                                    <div class="dropdown-item text-center">
-                                        <span>No new notifications</span>
                                     </div>
+                                    <div>
+                                        <div class="small text-gray-500">{{ $notification->created_at->format('F d, Y') }}</div>
+                                        <span class="{{ $notification->read_at ? '' : 'font-weight-bold' }}">
+                                            @if(isset($notification->data['message']))
+                                            {{ $notification->data['message'] }}
+                                            @elseif(isset($notification->data['title']))
+                                            {{ $notification->data['title'] }}
+                                            @else
+                                            New notification
+                                            @endif
+                                        </span>
+                                    </div>
+                                </a>
+                                @empty
+                                <div class="dropdown-item text-center">
+                                    <span>No new notifications</span>
+                                </div>
                                 @endforelse
                                 <a class="dropdown-item text-center small text-gray-500" href="{{ route('notifications.index') }}">Show All Alerts</a>
                             </div>
                         </li>
 
                         <!-- Nav Item - Messages -->
-                      <!-- End of sidebar addition -->
+                        <!-- End of sidebar addition -->
 
-                <!-- Nav Item - Messages -->
-                <li class="nav-item dropdown no-arrow mx-1">
-                    <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-envelope fa-fw"></i>
-                        <!-- Counter - Messages -->
-                        <span class="badge badge-danger badge-counter message-count" id="topbar-message-count"></span>
-                    </a>
-                    <!-- Dropdown - Messages -->
-                    <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
-                        aria-labelledby="messagesDropdown">
-                        <h6 class="dropdown-header">
-                            Messages Center
-                        </h6>
-                        <div id="message-preview-container">
-                            <div class="text-center py-4">
-                                <div class="spinner-border spinner-border-sm text-primary" role="status">
-                                    <span class="sr-only">Loading...</span>
+                        <!-- Nav Item - Messages -->
+                        <li class="nav-item dropdown no-arrow mx-1">
+                            <a class="nav-link dropdown-toggle" href="#" id="messagesDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <i class="fas fa-envelope fa-fw"></i>
+                                <!-- Counter - Messages -->
+                                <span class="badge badge-danger badge-counter message-count" id="topbar-message-count"></span>
+                            </a>
+                            <!-- Dropdown - Messages -->
+                            <div class="dropdown-list dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="messagesDropdown">
+                                <h6 class="dropdown-header">
+                                    Messages Center
+                                </h6>
+                                <div id="message-preview-container">
+                                    <div class="text-center py-4">
+                                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                                            <span class="sr-only">Loading...</span>
+                                        </div>
+                                    </div>
                                 </div>
+                                <a class="dropdown-item text-center small text-gray-500" href="{{ route('messages.index') }}">Read More Messages</a>
                             </div>
-                        </div>
-                        <a class="dropdown-item text-center small text-gray-500" href="{{ route('messages.index') }}">Read More Messages</a>
-                    </div>
-                </li>
-                <!-- End of topbar messages replacement -->
+                        </li>
+                        <!-- End of topbar messages replacement -->
 
                         <div class="topbar-divider d-none d-sm-block"></div>
 
@@ -447,10 +449,6 @@
                                 <a class="dropdown-item" href="{{ route('profile.settings') }}">
                                     <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
                                     Settings
-                                </a>
-                                <a class="dropdown-item" href="{{ route('activities.log') }}">
-                                    <i class="fas fa-list fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    Activity Log
                                 </a>
                                 <div class="dropdown-divider"></div>
                                 <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
@@ -528,43 +526,45 @@
 
     @stack('scripts')
     @push('scripts')
-<script>
-    $(document).ready(function() {
-        const searchInput = $('.navbar-search input[name="query"]');
-        const searchDropdown = $('<div class="dropdown-menu dropdown-menu-right p-0 shadow-sm" id="search-results-dropdown" style="width: 300px; max-height: 400px; overflow-y: auto;"></div>');
-        
-        // Add the dropdown after the search form
-        searchInput.closest('.navbar-search').after(searchDropdown);
-        
-        // Function to handle search
-        function performSearch() {
-            const query = searchInput.val().trim();
-            
-            if (query.length < 2) {
-                searchDropdown.hide();
-                return;
-            }
-            
-            // Show loading indicator
-            searchDropdown.html('<div class="text-center py-2"><i class="fas fa-spinner fa-spin"></i> Searching...</div>').show();
-            
-            $.ajax({
-                url: "{{ route('search.ajax') }}",
-                type: 'GET',
-                data: { query: query },
-                dataType: 'json',
-                success: function(data) {
-                    let results = '';
-                    let total = data.employees.length + data.projects.length + data.clients.length + data.tasks.length;
-                    
-                    if (total === 0) {
-                        results = '<div class="text-center py-3">No results found</div>';
-                    } else {
-                        // Employees
-                        if (data.employees.length > 0) {
-                            results += '<h6 class="dropdown-header">Employees</h6>';
-                            data.employees.forEach(function(employee) {
-                                results += `<a class="dropdown-item" href="${employee.url}">
+    <script>
+        $(document).ready(function() {
+            const searchInput = $('.navbar-search input[name="query"]');
+            const searchDropdown = $('<div class="dropdown-menu dropdown-menu-right p-0 shadow-sm" id="search-results-dropdown" style="width: 300px; max-height: 400px; overflow-y: auto;"></div>');
+
+            // Add the dropdown after the search form
+            searchInput.closest('.navbar-search').after(searchDropdown);
+
+            // Function to handle search
+            function performSearch() {
+                const query = searchInput.val().trim();
+
+                if (query.length < 2) {
+                    searchDropdown.hide();
+                    return;
+                }
+
+                // Show loading indicator
+                searchDropdown.html('<div class="text-center py-2"><i class="fas fa-spinner fa-spin"></i> Searching...</div>').show();
+
+                $.ajax({
+                    url: "{{ route('search.ajax') }}",
+                    type: 'GET',
+                    data: {
+                        query: query
+                    },
+                    dataType: 'json',
+                    success: function(data) {
+                        let results = '';
+                        let total = data.employees.length + data.projects.length + data.clients.length + data.tasks.length;
+
+                        if (total === 0) {
+                            results = '<div class="text-center py-3">No results found</div>';
+                        } else {
+                            // Employees
+                            if (data.employees.length > 0) {
+                                results += '<h6 class="dropdown-header">Employees</h6>';
+                                data.employees.forEach(function(employee) {
+                                    results += `<a class="dropdown-item" href="${employee.url}">
                                     <div class="d-flex align-items-center">
                                         <div class="mr-2">
                                             <i class="fas fa-user text-primary"></i>
@@ -575,14 +575,14 @@
                                         </div>
                                     </div>
                                 </a>`;
-                            });
-                        }
-                        
-                        // Projects
-                        if (data.projects.length > 0) {
-                            results += '<h6 class="dropdown-header">Projects</h6>';
-                            data.projects.forEach(function(project) {
-                                results += `<a class="dropdown-item" href="${project.url}">
+                                });
+                            }
+
+                            // Projects
+                            if (data.projects.length > 0) {
+                                results += '<h6 class="dropdown-header">Projects</h6>';
+                                data.projects.forEach(function(project) {
+                                    results += `<a class="dropdown-item" href="${project.url}">
                                     <div class="d-flex align-items-center">
                                         <div class="mr-2">
                                             <i class="fas fa-project-diagram text-success"></i>
@@ -593,14 +593,14 @@
                                         </div>
                                     </div>
                                 </a>`;
-                            });
-                        }
-                        
-                        // Clients
-                        if (data.clients.length > 0) {
-                            results += '<h6 class="dropdown-header">Clients</h6>';
-                            data.clients.forEach(function(client) {
-                                results += `<a class="dropdown-item" href="${client.url}">
+                                });
+                            }
+
+                            // Clients
+                            if (data.clients.length > 0) {
+                                results += '<h6 class="dropdown-header">Clients</h6>';
+                                data.clients.forEach(function(client) {
+                                    results += `<a class="dropdown-item" href="${client.url}">
                                     <div class="d-flex align-items-center">
                                         <div class="mr-2">
                                             <i class="fas fa-handshake text-info"></i>
@@ -611,14 +611,14 @@
                                         </div>
                                     </div>
                                 </a>`;
-                            });
-                        }
-                        
-                        // Tasks
-                        if (data.tasks.length > 0) {
-                            results += '<h6 class="dropdown-header">Tasks</h6>';
-                            data.tasks.forEach(function(task) {
-                                results += `<a class="dropdown-item" href="${task.url}">
+                                });
+                            }
+
+                            // Tasks
+                            if (data.tasks.length > 0) {
+                                results += '<h6 class="dropdown-header">Tasks</h6>';
+                                data.tasks.forEach(function(task) {
+                                    results += `<a class="dropdown-item" href="${task.url}">
                                     <div class="d-flex align-items-center">
                                         <div class="mr-2">
                                             <i class="fas fa-tasks text-warning"></i>
@@ -629,109 +629,109 @@
                                         </div>
                                     </div>
                                 </a>`;
-                            });
-                        }
-                        
-                        results += `<div class="dropdown-divider"></div>
+                                });
+                            }
+
+                            results += `<div class="dropdown-divider"></div>
                             <a class="dropdown-item text-center small text-gray-500" href="{{ route('search') }}?query=${encodeURIComponent(query)}">
                                 View All Results
                             </a>`;
+                        }
+
+                        searchDropdown.html(results).show();
+                    },
+                    error: function() {
+                        searchDropdown.html('<div class="text-center py-2">Error occurred during search</div>').show();
                     }
-                    
-                    searchDropdown.html(results).show();
-                },
-                error: function() {
-                    searchDropdown.html('<div class="text-center py-2">Error occurred during search</div>').show();
+                });
+            }
+
+            // Keyup event with debounce
+            let timer;
+            searchInput.on('keyup', function() {
+                clearTimeout(timer);
+                timer = setTimeout(performSearch, 300);
+            });
+
+            // Clicking outside closes the dropdown
+            $(document).on('click', function(e) {
+                if (!$(e.target).closest('.navbar-search').length && !$(e.target).closest('#search-results-dropdown').length) {
+                    searchDropdown.hide();
                 }
             });
-        }
-        
-        // Keyup event with debounce
-        let timer;
-        searchInput.on('keyup', function() {
-            clearTimeout(timer);
-            timer = setTimeout(performSearch, 300);
-        });
-        
-        // Clicking outside closes the dropdown
-        $(document).on('click', function(e) {
-            if (!$(e.target).closest('.navbar-search').length && !$(e.target).closest('#search-results-dropdown').length) {
+
+            // Focus on search input shows dropdown if it has content
+            searchInput.on('focus', function() {
+                if (searchInput.val().trim().length >= 2) {
+                    searchDropdown.show();
+                }
+            });
+
+            // When form is submitted, don't show dropdown
+            searchInput.closest('form').on('submit', function() {
                 searchDropdown.hide();
-            }
-        });
-        
-        // Focus on search input shows dropdown if it has content
-        searchInput.on('focus', function() {
-            if (searchInput.val().trim().length >= 2) {
-                searchDropdown.show();
-            }
-        });
-        
-        // When form is submitted, don't show dropdown
-        searchInput.closest('form').on('submit', function() {
-            searchDropdown.hide();
-        });
-    });
-    $(document).ready(function() {
-        // Function to update notifications
-        function updateNotifications() {
-            $.ajax({
-                url: "{{ route('notifications.getLatest') }}",
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // Update notification count
-                    let count = data.count;
-                    let countDisplay = count > 0 ? (count > 99 ? '99+' : count) : '';
-                    $('#alertsDropdown .badge-counter').text(countDisplay);
-                    
-                    // Update notification list (optional advanced feature)
-                    if (data.notifications && data.notifications.length > 0) {
-                        // Implement if you want to dynamically update the dropdown content
-                    }
-                }
             });
-        }
-        
-        // Update notifications every 60 seconds
-        setInterval(updateNotifications, 60000);
-    });
-    // Function to update message count and preview
-    $(document).ready(function() {
+        });
+        $(document).ready(function() {
+            // Function to update notifications
+            function updateNotifications() {
+                $.ajax({
+                    url: "{{ route('notifications.getLatest') }}",
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        // Update notification count
+                        let count = data.count;
+                        let countDisplay = count > 0 ? (count > 99 ? '99+' : count) : '';
+                        $('#alertsDropdown .badge-counter').text(countDisplay);
+
+                        // Update notification list (optional advanced feature)
+                        if (data.notifications && data.notifications.length > 0) {
+                            // Implement if you want to dynamically update the dropdown content
+                        }
+                    }
+                });
+            }
+
+            // Update notifications every 60 seconds
+            setInterval(updateNotifications, 60000);
+        });
         // Function to update message count and preview
-        function updateMessages() {
-            $.ajax({
-                url: "{{ route('messages.get-unread-count') }}",
-                type: 'GET',
-                dataType: 'json',
-                success: function(data) {
-                    // Update message counts
-                    let count = data.count;
-                    let countDisplay = count > 0 ? (count > 99 ? '99+' : count) : '';
-                    $('.message-count').text(countDisplay);
-                    
-                    // Load recent messages for dropdown preview
-                    if (count > 0) {
-                        $.ajax({
-                            url: "{{ route('messages.index') }}",
-                            type: 'GET',
-                            dataType: 'html',
-                            success: function(html) {
-                                // Extract recent conversations
-                                const tempDiv = document.createElement('div');
-                                tempDiv.innerHTML = html;
-                                
-                                const conversations = $(tempDiv).find('.list-group-item').slice(0, 3);
-                                let previewHtml = '';
-                                
-                                if (conversations.length > 0) {
-                                    conversations.each(function() {
-                                        const href = $(this).attr('href');
-                                        const avatar = $(this).find('.avatar-circle').prop('outerHTML');
-                                        const name = $(this).find('h6').text().trim();
-                                        const message = $(this).find('p').text().trim();
-                                        
-                                        previewHtml += `
+        $(document).ready(function() {
+            // Function to update message count and preview
+            function updateMessages() {
+                $.ajax({
+                    url: "{{ route('messages.get-unread-count') }}",
+                    type: 'GET',
+                    dataType: 'json',
+                    success: function(data) {
+                        // Update message counts
+                        let count = data.count;
+                        let countDisplay = count > 0 ? (count > 99 ? '99+' : count) : '';
+                        $('.message-count').text(countDisplay);
+
+                        // Load recent messages for dropdown preview
+                        if (count > 0) {
+                            $.ajax({
+                                url: "{{ route('messages.index') }}",
+                                type: 'GET',
+                                dataType: 'html',
+                                success: function(html) {
+                                    // Extract recent conversations
+                                    const tempDiv = document.createElement('div');
+                                    tempDiv.innerHTML = html;
+
+                                    const conversations = $(tempDiv).find('.list-group-item').slice(0, 3);
+                                    let previewHtml = '';
+
+                                    if (conversations.length > 0) {
+                                        conversations.each(function() {
+                                            const href = $(this).attr('href');
+                                            const avatar = $(this).find('.avatar-circle').prop('outerHTML');
+                                            const name = $(this).find('h6').text().trim();
+                                            const message = $(this).find('p').text().trim();
+
+                                            previewHtml += `
                                             <a class="dropdown-item d-flex align-items-center" href="${href}">
                                                 <div class="dropdown-list-image mr-3">
                                                     ${avatar}
@@ -742,28 +742,29 @@
                                                 </div>
                                             </a>
                                         `;
-                                    });
-                                } else {
-                                    previewHtml = '<div class="dropdown-item text-center">No new messages</div>';
+                                        });
+                                    } else {
+                                        previewHtml = '<div class="dropdown-item text-center">No new messages</div>';
+                                    }
+
+                                    $('#message-preview-container').html(previewHtml);
                                 }
-                                
-                                $('#message-preview-container').html(previewHtml);
-                            }
-                        });
-                    } else {
-                        $('#message-preview-container').html('<div class="dropdown-item text-center">No new messages</div>');
+                            });
+                        } else {
+                            $('#message-preview-container').html('<div class="dropdown-item text-center">No new messages</div>');
+                        }
                     }
-                }
-            });
-        }
-        
-        // Initial update
-        updateMessages();
-        
-        // Update messages every 30 seconds
-        setInterval(updateMessages, 30000);
-    });
-</script>
-@endpush
+                });
+            }
+
+            // Initial update
+            updateMessages();
+
+            // Update messages every 30 seconds
+            setInterval(updateMessages, 30000);
+        });
+    </script>
+    @endpush
 </body>
+
 </html>

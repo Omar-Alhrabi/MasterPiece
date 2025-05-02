@@ -80,7 +80,7 @@ class AdminNotificationController extends Controller
                 }
                 
                 // Process the queue immediately
-                Artisan::call('queue:work', ['--stop-when-empty' => true]);
+             /*    Artisan::call('queue:work', ['--stop-when-empty' => true]); */
                 
                 return redirect()->route('admin.notifications.index')
                     ->with('success', 'Notification sent successfully to ' . count($recipients) . ' recipients.');

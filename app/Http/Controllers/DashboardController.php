@@ -30,6 +30,7 @@ class DashboardController extends Controller
         } else {
             return $this->employeeDashboard($user);
         }
+        
     }
     
     /**
@@ -142,6 +143,104 @@ class DashboardController extends Controller
             'departments',
             'earningsData',
             'revenueSources'
+        ));
+    }
+    public function generateReport(Request $request)
+    {
+        // Get selected month and year from request, default to current month/year
+        $selectedMonth = $request->input('month', Carbon::now()->month);
+        $selectedYear = $request->input('year', Carbon::now()->year);
+
+        // Create Carbon instance for the selected month/year
+        $date = Carbon::createFromDate($selectedYear, $selectedMonth, 1);
+        $monthName = $date->format('F');
+        $year = $date->year;
+
+        // Get new clients for selected month
+        $newClients = Client::whereMonth('created_at', $selectedMonth)
+            ->whereYear('created_at', $selectedYear)
+            ->get();
+
+        $totalClients = Client::count();
+        $newClientsCount = $newClients->count();
+
+        // Get projects data for selected month
+        $projects = Project::whereMonth('created_at', $selectedMonth)
+            ->whereYear('created_at', $selectedYear)
+            ->with(['client', 'manager', 'users'])
+            ->get();
+
+        $totalProjects = Project::count();
+        $newProjectsCount = $projects->count();
+
+        // Get completed projects for selected month
+        $completedProjects = Project::where('status', 'Completed')
+            ->whereMonth('updated_at', $selectedMonth)
+            ->whereYear('updated_at', $selectedYear)
+            ->get();
+
+        $completedProjectsCount = $completedProjects->count();
+
+        // Calculate earnings for the selected month
+        $monthlyEarnings = $completedProjects->sum('budget');
+
+        // Get earnings per month for the selected year
+        $earningsData = [];
+
+        for ($month = 1; $month <= 12; $month++) {
+            $completedProjectsEarnings = Project::where('status', 'Completed')
+                ->whereYear('updated_at', $selectedYear)
+                ->whereMonth('updated_at', $month)
+                ->sum('budget');
+
+            $earningsData[$month] = $completedProjectsEarnings ?: 0;
+        }
+
+        // Get project statistics
+        $projectStats = [
+            'pending' => Project::where('status', 'Pending')->count(),
+            'in_progress' => Project::where('status', 'In Progress')->count(),
+            'completed' => Project::where('status', 'Completed')->count(),
+            'on_hold' => Project::where('status', 'On Hold')->count(),
+            'cancelled' => Project::where('status', 'Cancelled')->count(),
+        ];
+
+        // Get top clients by project count
+        $topClients = Client::withCount('projects')
+            ->orderBy('projects_count', 'desc')
+            ->take(5)
+            ->get();
+
+        // Get top employees by completed tasks for selected month
+        $topEmployees = User::where('role', 'user')
+            ->withCount(['assignedTasks as completed_tasks' => function ($query) use ($selectedMonth, $selectedYear) {
+                $query->where('status', 'Completed')
+                    ->whereMonth('updated_at', $selectedMonth)
+                    ->whereYear('updated_at', $selectedYear);
+            }])
+            ->orderBy('completed_tasks', 'desc')
+            ->take(5)
+            ->get();
+
+        // Return the report view
+        return view('reports.monthly', compact(
+            'monthName',
+            'year',
+            'totalClients',
+            'newClientsCount',
+            'newClients',
+            'totalProjects',
+            'newProjectsCount',
+            'projects',
+            'completedProjectsCount',
+            'completedProjects',
+            'monthlyEarnings',
+            'earningsData',
+            'projectStats',
+            'topClients',
+            'topEmployees',
+            'selectedMonth',
+            'selectedYear'
         ));
     }
     

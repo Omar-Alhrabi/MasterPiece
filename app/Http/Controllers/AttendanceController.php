@@ -121,6 +121,27 @@ class AttendanceController extends Controller
                             ->with('error', 'You have already checked out today.');
         }
         
+        // If on break, automatically end break
+        if ($attendance->break_start && !$attendance->break_end) {
+            $attendance->break_end = $currentTime;
+            
+            // If there was a previous break, add to the multiple_breaks field
+            if ($attendance->breaks) {
+                $breakStartTime = Carbon::parse($attendance->break_start)->format('h:i A');
+                $breakEndTime = Carbon::parse($currentTime)->format('h:i A');
+                $existingBreaks = $attendance->breaks;
+                $attendance->breaks = $existingBreaks . ', ' . $breakStartTime . ' - ' . $breakEndTime;
+            } else {
+                $breakStartTime = Carbon::parse($attendance->break_start)->format('h:i A');
+                $breakEndTime = Carbon::parse($currentTime)->format('h:i A');
+                $attendance->breaks = $breakStartTime . ' - ' . $breakEndTime;
+            }
+            
+            $attendance->break_start = null;
+            $attendance->break_end = null;
+            $attendance->multiple_breaks = true;
+        }
+        
         // Determine if it's half-day
         if ($attendance->status === 'Present' || $attendance->status === 'Late') {
             $checkInTime = Carbon::parse($attendance->check_in);
@@ -138,7 +159,97 @@ class AttendanceController extends Controller
         return redirect()->route('attendance.record')
                         ->with('success', 'Check-out successful.');
     }
-
+    
+    /**
+     * Start a break.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function breakStart()
+    {
+        $today = Carbon::now()->format('Y-m-d');
+        $currentTime = Carbon::now();
+        
+        // Find today's attendance record
+        $attendance = Attendance::where('user_id', Auth::id())
+                              ->where('date', $today)
+                              ->first();
+        
+        if (!$attendance) {
+            return redirect()->route('attendance.record')
+                            ->with('error', 'You need to check in first before taking a break.');
+        }
+        
+        if ($attendance->check_out) {
+            return redirect()->route('attendance.record')
+                            ->with('error', 'You have already checked out today.');
+        }
+        
+        if ($attendance->break_start && !$attendance->break_end) {
+            return redirect()->route('attendance.record')
+                            ->with('error', 'You are already on a break.');
+        }
+        
+        // If previous break exists, store it in the multiple_breaks field
+        if ($attendance->break_start && $attendance->break_end) {
+            $breakStartTime = Carbon::parse($attendance->break_start)->format('h:i A');
+            $breakEndTime = Carbon::parse($attendance->break_end)->format('h:i A');
+            
+            if ($attendance->breaks) {
+                $existingBreaks = $attendance->breaks;
+                $attendance->breaks = $existingBreaks . ', ' . $breakStartTime . ' - ' . $breakEndTime;
+            } else {
+                $attendance->breaks = $breakStartTime . ' - ' . $breakEndTime;
+            }
+            
+            $attendance->multiple_breaks = true;
+        }
+        
+        $attendance->break_start = $currentTime;
+        $attendance->break_end = null;
+        $attendance->save();
+        
+        return redirect()->route('attendance.record')
+                        ->with('success', 'Break started.');
+    }
+    
+    /**
+     * End a break.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function breakEnd()
+    {
+        $today = Carbon::now()->format('Y-m-d');
+        $currentTime = Carbon::now();
+        
+        // Find today's attendance record
+        $attendance = Attendance::where('user_id', Auth::id())
+                              ->where('date', $today)
+                              ->first();
+        
+        if (!$attendance) {
+            return redirect()->route('attendance.record')
+                            ->with('error', 'No attendance record found for today.');
+        }
+        
+        if (!$attendance->break_start) {
+            return redirect()->route('attendance.record')
+                            ->with('error', 'You have not started a break.');
+        }
+        
+        if ($attendance->break_end) {
+            return redirect()->route('attendance.record')
+                            ->with('error', 'Break has already ended.');
+        }
+        
+        $attendance->break_end = $currentTime;
+        $attendance->save();
+        
+        return redirect()->route('attendance.record')
+                        ->with('success', 'Break ended.');
+    }
+    
     /**
      * Display attendance reports.
      *
@@ -216,7 +327,7 @@ class AttendanceController extends Controller
         
         for ($date = $start->copy(); $date->lte($end); $date->addDay()) {
             // Skip weekends (Saturday and Sunday)
-            if ($date->dayOfWeek !== Carbon::SATURDAY && $date->dayOfWeek !== Carbon::SUNDAY) {
+            if ($date->dayOfWeek !== Carbon::FRIDAY && $date->dayOfWeek !== Carbon::SATURDAY) {
                 $days++;
             }
         }
@@ -263,6 +374,7 @@ class AttendanceController extends Controller
             'check_out' => 'nullable|date_format:H:i|after:check_in',
             'status' => 'required|in:Present,Absent,Late,Half-day',
             'note' => 'nullable|string',
+            'breaks' => 'nullable|string',
         ]);
         
         // Convert time strings to datetime objects
@@ -331,6 +443,7 @@ class AttendanceController extends Controller
             'check_out' => 'nullable|date_format:H:i|after:check_in',
             'status' => 'required|in:Present,Absent,Late,Half-day',
             'note' => 'nullable|string',
+            'breaks' => 'nullable|string',
         ]);
         
         // Convert time strings to datetime objects
@@ -425,7 +538,6 @@ class AttendanceController extends Controller
             $leaveStart = Carbon::parse($leaveStart);
             $leaveEnd = Carbon::parse($leaveEnd);
             
-          
             for ($date = $leaveStart->copy(); $date->lte($leaveEnd); $date->addDay()) {
                 if ($date->dayOfWeek !== Carbon::SATURDAY && $date->dayOfWeek !== Carbon::SUNDAY) {
                     $paidLeaveDays++;
@@ -444,7 +556,6 @@ class AttendanceController extends Controller
                           })
                           ->get();
         
-  
         $unpaidLeaveDays = 0;
         foreach ($unpaidLeaves as $leave) {
             $leaveStart = max($startDate->format('Y-m-d'), $leave->start_date);
@@ -453,7 +564,6 @@ class AttendanceController extends Controller
             $leaveStart = Carbon::parse($leaveStart);
             $leaveEnd = Carbon::parse($leaveEnd);
             
-      
             for ($date = $leaveStart->copy(); $date->lte($leaveEnd); $date->addDay()) {
                 if ($date->dayOfWeek !== Carbon::SATURDAY && $date->dayOfWeek !== Carbon::SUNDAY) {
                     $unpaidLeaveDays++;
@@ -461,15 +571,13 @@ class AttendanceController extends Controller
             }
         }
         
-       
+        // Get user salary
         $user = User::findOrFail($userId);
         $salary = $user->salary ?? 0;
         
-     
+        // Calculate estimated salary
         $dailyRate = ($workingDays > 0) ? ($salary / $workingDays) : 0;
         $estimatedSalary = $dailyRate * ($presentDays + $paidLeaveDays + ($halfDays * 0.5));
-        
-     
         
         return response()->json([
             'working_days' => $workingDays,
@@ -478,7 +586,7 @@ class AttendanceController extends Controller
             'absent_days' => $absentDays,
             'paid_leaves' => $paidLeaveDays,
             'unpaid_leaves' => $unpaidLeaveDays,
-            'overtime_hours' => 0, 
+            'overtime_hours' => 0, // We'll implement this later
             'estimated_salary' => round($estimatedSalary, 2)
         ]);
     }

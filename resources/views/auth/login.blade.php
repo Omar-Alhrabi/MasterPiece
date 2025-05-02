@@ -1,41 +1,52 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR System - Modern Human Resource Management</title>
+    <title>HR System</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    <link rel="icon" href="{{ asset('image/favicon.png') }}" type="image/png">
+
     <style>
         :root {
             --primary-color: #486edb;
             --secondary-color: #3d5cba;
         }
+
         .bg-primary {
             background-color: var(--primary-color);
         }
+
         .bg-primary-gradient {
             background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         }
+
         .text-primary {
             color: var(--primary-color);
         }
+
         .border-primary {
             border-color: var(--primary-color);
         }
+
         .login-container {
             backdrop-filter: blur(5px);
             background-color: rgba(255, 255, 255, 0.9);
         }
+
         .feature-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
         }
+
         .smooth-scroll {
             scroll-behavior: smooth;
         }
     </style>
 </head>
+
 <body class="font-sans antialiased smooth-scroll">
     <!-- Navigation -->
     <nav class="fixed w-full bg-white shadow-md z-50">
@@ -90,7 +101,7 @@
                         </a>
                     </div>
                 </div>
-                
+
                 <!-- Right side login form -->
                 <div class="w-full md:w-1/2 md:pl-12">
                     <div class="bg-white rounded-xl shadow-xl p-8 max-w-md mx-auto">
@@ -113,7 +124,7 @@
                                             <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd" />
                                         </svg>
                                     </span>
-                                    <input id="email" class="pl-10 py-3 block w-full rounded-lg border-none shadow-sm text-gray-800" 
+                                    <input id="email" class="pl-10 py-3 block w-full rounded-lg border-none shadow-sm text-gray-800"
                                         type="email" name="email" placeholder="Username or E-mail" required autofocus autocomplete="username" />
                                 </div>
                                 <div class="mt-2 text-red-300"></div>
@@ -135,7 +146,7 @@
                                 </div>
                                 <div class="mt-2 text-red-300"></div>
                             </div>
-                            
+
                             <div class="text-right">
                                 <a class="text-sm text-primary hover:text-secondary-color" href="#">
                                     Forgot password?
@@ -187,7 +198,7 @@
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">Powerful HR Features</h2>
                 <p class="text-gray-600 max-w-2xl mx-auto">Our comprehensive HRMS solution offers everything you need to manage your workforce effectively.</p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Feature 1 -->
                 <div class="feature-card bg-white rounded-lg p-6 shadow-md border-t-4 border-primary transition duration-300">
@@ -197,7 +208,7 @@
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Employee Management</h3>
                     <p class="text-gray-600">Centralize employee data, track performance, and manage all personnel information in one secure location.</p>
                 </div>
-                
+
                 <!-- Feature 2 -->
                 <div class="feature-card bg-white rounded-lg p-6 shadow-md border-t-4 border-primary transition duration-300">
                     <div class="text-primary text-3xl mb-4">
@@ -206,7 +217,7 @@
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Payroll Management</h3>
                     <p class="text-gray-600">Automate salary calculations, tax deductions, and generate payslips with our powerful payroll engine.</p>
                 </div>
-                
+
                 <!-- Feature 3 -->
                 <div class="feature-card bg-white rounded-lg p-6 shadow-md border-t-4 border-primary transition duration-300">
                     <div class="text-primary text-3xl mb-4">
@@ -215,7 +226,7 @@
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Leave Management</h3>
                     <p class="text-gray-600">Streamline leave requests, approvals, and balances while ensuring adequate staffing levels at all times.</p>
                 </div>
-                
+
                 <!-- Feature 4 -->
                 <div class="feature-card bg-white rounded-lg p-6 shadow-md border-t-4 border-primary transition duration-300">
                     <div class="text-primary text-3xl mb-4">
@@ -224,7 +235,7 @@
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Attendance Tracking</h3>
                     <p class="text-gray-600">Monitor employee attendance, track work hours, and manage shifts with our intuitive attendance system.</p>
                 </div>
-                
+
                 <!-- Feature 5 -->
                 <div class="feature-card bg-white rounded-lg p-6 shadow-md border-t-4 border-primary transition duration-300">
                     <div class="text-primary text-3xl mb-4">
@@ -233,7 +244,7 @@
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">Project Management</h3>
                     <p class="text-gray-600">Plan, execute, and track projects, allocate resources, and monitor progress all within one platform.</p>
                 </div>
-                
+
                 <!-- Feature 6 -->
                 <div class="feature-card bg-white rounded-lg p-6 shadow-md border-t-4 border-primary transition duration-300">
                     <div class="text-primary text-3xl mb-4">
@@ -243,7 +254,7 @@
                     <p class="text-gray-600">Generate insightful reports and dashboards to make data-driven decisions for your organization.</p>
                 </div>
             </div>
-            
+
             <div class="text-center mt-12">
                 <a href="#contact" class="inline-block bg-primary hover:bg-secondary-color text-white font-medium py-3 px-8 rounded-lg transition duration-300">
                     Get Started Today
@@ -288,7 +299,7 @@
                 </div>
                 <div class="w-full lg:w-1/2 lg:pl-16">
                     <h3 class="text-2xl font-bold text-gray-800 mb-6">Why Choose Our HRMS</h3>
-                    
+
                     <div class="space-y-4">
                         <div class="flex">
                             <div class="flex-shrink-0 mt-1">
@@ -301,7 +312,7 @@
                                 <p class="text-gray-600 mt-2">Our intuitive design ensures that employees at all levels can navigate the system with ease, reducing training time.</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex">
                             <div class="flex-shrink-0 mt-1">
                                 <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white">
@@ -313,7 +324,7 @@
                                 <p class="text-gray-600 mt-2">Adapt the system to your specific business processes rather than changing your processes to fit the software.</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex">
                             <div class="flex-shrink-0 mt-1">
                                 <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white">
@@ -325,7 +336,7 @@
                                 <p class="text-gray-600 mt-2">Our team is available to provide technical assistance and answer questions whenever you need help.</p>
                             </div>
                         </div>
-                        
+
                         <div class="flex">
                             <div class="flex-shrink-0 mt-1">
                                 <div class="w-6 h-6 rounded-full bg-primary flex items-center justify-center text-white">
@@ -350,7 +361,7 @@
                 <h2 class="text-3xl font-bold text-gray-800 mb-4">What Our Clients Say</h2>
                 <p class="text-gray-600 max-w-2xl mx-auto">Hear from businesses that have transformed their HR processes with our system.</p>
             </div>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                 <!-- Testimonial 1 -->
                 <div class="bg-gray-50 rounded-lg p-6 shadow-md">
@@ -372,7 +383,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Testimonial 2 -->
                 <div class="bg-gray-50 rounded-lg p-6 shadow-md">
                     <div class="flex items-center mb-4">
@@ -393,7 +404,7 @@
                         </div>
                     </div>
                 </div>
-                
+
                 <!-- Testimonial 3 -->
                 <div class="bg-gray-50 rounded-lg p-6 shadow-md">
                     <div class="flex items-center mb-4">
@@ -425,7 +436,7 @@
                 <h2 class="text-3xl font-bold mb-4">Get In Touch</h2>
                 <p class="text-gray-300 max-w-2xl mx-auto">Have questions about our HRMS? Contact us for more information or to schedule a demo.</p>
             </div>
-            
+
             <div class="flex flex-col md:flex-row">
                 <div class="w-full md:w-1/2 mb-12 md:mb-0 md:pr-8">
                     <form class="space-y-6" action="https://api.web3forms.com/submit" method="POST">
@@ -456,7 +467,7 @@
                 <div class="w-full md:w-1/2 md:pl-8">
                     <div class="bg-gray-800 rounded-lg p-6 md:p-8 h-full">
                         <h3 class="text-xl font-bold mb-6">Contact Information</h3>
-                        
+
                         <div class="space-y-6">
                             <div class="flex items-start">
                                 <div class="text-primary text-xl mr-4">
@@ -467,7 +478,7 @@
                                     <p class="text-gray-400">123 Business Avenue, Technology Park<br>Amman, Jordan</p>
                                 </div>
                             </div>
-                            
+
                             <div class="flex items-start">
                                 <div class="text-primary text-xl mr-4">
                                     <i class="fas fa-phone-alt"></i>
@@ -477,7 +488,7 @@
                                     <p class="text-gray-400">+962 6 123 4567</p>
                                 </div>
                             </div>
-                            
+
                             <div class="flex items-start">
                                 <div class="text-primary text-xl mr-4">
                                     <i class="fas fa-envelope"></i>
@@ -487,7 +498,7 @@
                                     <p class="text-gray-400">info@hrsystem.com</p>
                                 </div>
                             </div>
-                            
+
                             <div class="flex items-start">
                                 <div class="text-primary text-xl mr-4">
                                     <i class="fas fa-clock"></i>
@@ -498,7 +509,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="mt-8">
                             <h4 class="font-semibold mb-4">Follow Us</h4>
                             <div class="flex space-x-4">
@@ -535,7 +546,7 @@
                     </div>
                     <p class="text-gray-400 max-w-xs">Transforming how businesses manage their workforce with intuitive and powerful HR solutions.</p>
                 </div>
-                
+
                 <div class="grid grid-cols-2 md:grid-cols-3 gap-8">
                     <div>
                         <h3 class="text-lg font-semibold mb-4">Quick Links</h3>
@@ -546,7 +557,7 @@
                             <li><a href="#contact" class="hover:text-primary transition">Contact</a></li>
                         </ul>
                     </div>
-                    
+
                     <div>
                         <h3 class="text-lg font-semibold mb-4">Features</h3>
                         <ul class="space-y-2">
@@ -556,7 +567,7 @@
                             <li><a href="#" class="hover:text-primary transition">Attendance</a></li>
                         </ul>
                     </div>
-                    
+
                     <div>
                         <h3 class="text-lg font-semibold mb-4">Resources</h3>
                         <ul class="space-y-2">
@@ -568,7 +579,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="border-t border-gray-700 mt-8 pt-8 flex flex-col md:flex-row justify-between items-center">
                 <p>© 2025 HR System. All rights reserved.</p>
                 <div class="mt-4 md:mt-0">
@@ -588,15 +599,15 @@
             const mobileMenu = document.getElementById('mobile-menu');
             mobileMenu.classList.toggle('hidden');
         });
-        
+
         // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function(e) {
                 e.preventDefault();
-                
+
                 // Close mobile menu if open
                 document.getElementById('mobile-menu').classList.add('hidden');
-                
+
                 // Scroll to the section
                 document.querySelector(this.getAttribute('href')).scrollIntoView({
                     behavior: 'smooth'
@@ -605,4 +616,5 @@
         });
     </script>
 </body>
+
 </html>

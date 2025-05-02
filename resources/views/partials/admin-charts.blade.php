@@ -88,30 +88,35 @@
 <!-- Second Row Charts -->
 <div class="row">
     <!-- Bar Chart - Staff by Department -->
-    <div class="col-xl-8 col-lg-7">
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
-                <h6 class="m-0 font-weight-bold text-primary">Staff by Department</h6>
-                <div class="dropdown no-arrow">
-                    <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
-                        data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                        <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
-                    </a>
-                    <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
-                        <div class="dropdown-header">View Options:</div>
-                        <a class="dropdown-item" href="#">All Departments</a>
-                        <div class="dropdown-divider"></div>
-                        <a class="dropdown-item" href="#">Manage Departments</a>
+    <div id="department-stats-data" style="display:none;"
+    data-names='@json($departments->pluck("name"))'
+    data-counts='@json($departments->pluck("users_count"))'>
+    </div>
+
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3 d-flex flex-row align-items-center justify-content-between">
+                    <h6 class="m-0 font-weight-bold text-primary">Staff by Department</h6>
+                    <div class="dropdown no-arrow">
+                        <a class="dropdown-toggle" href="#" role="button" id="dropdownMenuLink"
+                            data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-ellipsis-v fa-sm fa-fw text-gray-400"></i>
+                        </a>
+                        <div class="dropdown-menu dropdown-menu-right shadow animated--fade-in">
+                            <div class="dropdown-header">View Options:</div>
+                            <a class="dropdown-item" href="#">All Departments</a>
+                            <div class="dropdown-divider"></div>
+                            <a class="dropdown-item" href="#">Manage Departments</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="chart-bar" style="height: 300px; min-height: 300px; position: relative;">
+                        <canvas id="departmentBarChart" style="width:100%; height:100%;"></canvas>
                     </div>
                 </div>
             </div>
-            <div class="card-body">
-                <div class="chart-bar">
-                    <canvas id="departmentBarChart"></canvas>
-                </div>
-            </div>
         </div>
-    </div>
     
     <!-- Line Chart - Monthly Task Completion -->
     <div class="col-xl-4 col-lg-5">
