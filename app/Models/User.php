@@ -183,12 +183,20 @@ public function conversations()
 /**
  * Get unread messages count.
  */
-public function unreadMessagesCount()
-{
-    return $this->receivedMessages()
-                ->where('is_read', false)
-                ->count();
-}
+    /**
+     * Get count of unread messages for this user
+     */
+    public function unreadMessagesCount()
+    {
+        return Message::whereHas('conversations', function ($query) {
+            $query->whereHas('users', function ($q) {
+                $q->where('users.id', $this->id);
+            });
+        })
+            ->where('sender_id', '!=', $this->id)
+            ->where('is_read', false)
+            ->count();
+    }
 
 /**
  * Get conversations with unread messages.

@@ -63,7 +63,7 @@ class AttendanceController extends Controller
     public function checkIn(Request $request)
     {
         $today = Carbon::now()->format('Y-m-d');
-        $currentTime = Carbon::now();
+        $currentTime = Carbon::now("+03:00");
         
         // Check if user has already checked in today
         $attendance = Attendance::where('user_id', Auth::id())

@@ -256,48 +256,48 @@ class MessageController extends Controller
 
     public function getRecentMessages()
     {
-    $user = Auth::user();
-    $recentConversations = $user->conversations()
-        ->with(['users' => function($query) use ($user) {
-            $query->where('users.id', '!=', $user->id);
-        }])
-        ->withCount(['messages as unread_count' => function ($query) use ($user) {
-            $query->where('sender_id', '!=', $user->id)
-                  ->where('is_read', false);
-        }])
-        ->orderBy('updated_at', 'desc')
-        ->take(5)
-        ->get();
-        
-    $html = '';
-    
-    foreach ($recentConversations as $conversation) {
-        $otherUser = null;
-        $conversationName = '';
-        
-        if ($conversation->type == 'private') {
-            $otherUser = $conversation->users->first();
-            $conversationName = $otherUser ? $otherUser->first_name . ' ' . $otherUser->last_name : 'Unknown User';
-        } else {
-            $conversationName = $conversation->name;
+        $user = Auth::user();
+        $recentConversations = $user->conversations()
+            ->with(['users' => function ($query) use ($user) {
+                $query->where('users.id', '!=', $user->id);
+            }])
+            ->withCount(['messages as unread_count' => function ($query) use ($user) {
+                $query->where('sender_id', '!=', $user->id)
+                    ->where('is_read', false);
+            }])
+            ->orderBy('updated_at', 'desc')
+            ->take(5)
+            ->get();
+
+        $html = '';
+
+        foreach ($recentConversations as $conversation) {
+            $otherUser = null;
+            $conversationName = '';
+
+            if ($conversation->type == 'private') {
+                $otherUser = $conversation->users->first();
+                $conversationName = $otherUser ? $otherUser->first_name . ' ' . $otherUser->last_name : 'Unknown User';
+            } else {
+                $conversationName = $conversation->name;
+            }
+
+            $latestMessage = $conversation->messages()->orderBy('created_at', 'desc')->first();
+            $messageText = $latestMessage ? \Illuminate\Support\Str::limit($latestMessage->message, 30) : 'No messages yet';
+            $time = $latestMessage ? $latestMessage->created_at->diffForHumans() : '';
+
+            $html .= view('messages.partials.preview-item', compact('conversation', 'conversationName', 'otherUser', 'messageText', 'time'))->render();
         }
-        
-        $latestMessage = $conversation->messages()->orderBy('created_at', 'desc')->first();
-        $messageText = $latestMessage ? Str::limit($latestMessage->message, 30) : 'No messages yet';
-        $time = $latestMessage ? $latestMessage->created_at->diffForHumans() : '';
-        
-        $html .= view('messages.partials.preview-item', compact('conversation', 'conversationName', 'otherUser', 'messageText', 'time'))->render();
+
+        if (empty($html)) {
+            $html = '<div class="dropdown-item text-center">No new messages</div>';
+        }
+
+        return response()->json([
+            'html' => $html,
+            'count' => $user->unreadMessagesCount()
+        ]);
     }
-    
-    if (empty($html)) {
-        $html = '<div class="dropdown-item text-center">No new messages</div>';
-    }
-    
-    return response()->json([
-        'html' => $html,
-        'count' => $user->unreadMessagesCount()
-    ]);
-}
 
 /**
  * Mark a message as read

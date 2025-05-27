@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HR System</title>
+    <title>MyCompany </title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <link rel="icon" href="{{ asset('image/favicon.png') }}" type="image/png">
@@ -55,7 +55,7 @@
                 <div class="text-xl font-bold text-primary mr-2">
                     <i class="far fa-smile-beam"></i>
                 </div>
-                <span class="font-bold text-xl text-gray-800">HR SYSTEM</span>
+                <span class="font-bold text-xl text-gray-800 uppercase">Enterprise 360</span>
             </div>
             <div class="hidden md:flex items-center space-x-8">
                 <a href="#home" class="text-gray-600 hover:text-primary transition">Home</a>
@@ -87,10 +87,11 @@
                 <!-- Left side content -->
                 <div class="w-full md:w-1/2 mb-12 md:mb-0">
                     <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-6">
-                        Modern HR Management System for Growing Businesses
+                        Modern Company Management System for Growing Businesses
                     </h1>
                     <p class="text-lg text-gray-600 mb-8">
-                        Streamline your HR processes, manage employees effectively, and make data-driven decisions with our comprehensive HRMS solution.
+                        Manage all your company operations — HR, sales, finance, and more — in one smart and easy system.
+                        Grow faster, work smarter, and stay in control with our all-in-one solution.
                     </p>
                     <div class="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4">
                         <a href="#contact" class="bg-primary hover:bg-secondary-color text-white font-medium py-3 px-6 rounded-lg transition duration-300 text-center">

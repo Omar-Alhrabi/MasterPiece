@@ -6,6 +6,7 @@ use App\Models\Event;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Carbon\Carbon;
 
 class EventController extends Controller
 {
@@ -30,8 +31,8 @@ class EventController extends Controller
         // Apply date filter if provided
         if ($request->has('date_range') && !empty($request->date_range)) {
             [$startDate, $endDate] = explode(' - ', $request->date_range);
-            $startDate = \Carbon\Carbon::createFromFormat('m/d/Y', $startDate)->format('Y-m-d');
-            $endDate = \Carbon\Carbon::createFromFormat('m/d/Y', $endDate)->format('Y-m-d');
+            $startDate = Carbon::createFromFormat('m/d/Y', $startDate)->format('Y-m-d');
+            $endDate = Carbon::createFromFormat('m/d/Y', $endDate)->format('Y-m-d');
             
             $query->whereBetween('event_date', [$startDate, $endDate]);
         }

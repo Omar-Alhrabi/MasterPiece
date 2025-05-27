@@ -1,589 +1,439 @@
-// Wait for document to be fully loaded
+// dashboard.js - Optimized chart initialization for admin dashboard
 document.addEventListener('DOMContentLoaded', function() {
-    // Helper function for formatting numbers
-    function number_format(number, decimals, dec_point, thousands_sep) {
-        number = (number + '').replace(',', '').replace(' ', '');
-        var n = !isFinite(+number) ? 0 : +number,
-            prec = !isFinite(+decimals) ? 0 : Math.abs(decimals),
-            sep = (typeof thousands_sep === 'undefined') ? ',' : thousands_sep,
-            dec = (typeof dec_point === 'undefined') ? '.' : dec_point,
-            s = '',
-            toFixedFix = function(n, prec) {
-                var k = Math.pow(10, prec);
-                return '' + Math.round(n * k) / k;
-            };
-        s = (prec ? toFixedFix(n, prec) : '' + Math.round(n)).split('.');
-        if (s[0].length > 3) {
-            s[0] = s[0].replace(/\B(?=(?:\d{3})+(?!\d))/g, sep);
-        }
-        if ((s[1] || '').length < prec) {
-            s[1] = s[1] || '';
-            s[1] += new Array(prec - s[1].length + 1).join('0');
-        }
-        return s.join(dec);
-    }
-
-    // Chart.js default configuration to reduce duplicate code
-    if (typeof Chart !== 'undefined') {
-        Chart.defaults.global.tooltips.backgroundColor = "rgb(255,255,255)";
-        Chart.defaults.global.tooltips.bodyFontColor = "#858796";
-        Chart.defaults.global.tooltips.titleMarginBottom = 10;
-        Chart.defaults.global.tooltips.titleFontColor = '#6e707e';
-        Chart.defaults.global.tooltips.titleFontSize = 14;
-        Chart.defaults.global.tooltips.borderColor = '#dddfeb';
-        Chart.defaults.global.tooltips.borderWidth = 1;
-        Chart.defaults.global.tooltips.xPadding = 15;
-        Chart.defaults.global.tooltips.yPadding = 15;
-        Chart.defaults.global.tooltips.displayColors = false;
-        Chart.defaults.global.tooltips.caretPadding = 10;
-        Chart.defaults.global.legend.display = false;
-        Chart.defaults.global.maintainAspectRatio = false;
-        Chart.defaults.global.responsive = true; // Add responsive setting
-    }
-
-    // Check for admin user and initialize admin charts
-    const isAdmin = document.body.classList.contains('admin-dashboard');
-    if (isAdmin && typeof Chart !== 'undefined') {
-        // Only initialize charts if elements exist
-        const earningsAreaChart = document.getElementById('earningsAreaChart');
-        if (earningsAreaChart) {
-            initEarningsChart(earningsAreaChart);
-        }
-
-        const projectStatusPieChart = document.getElementById('projectStatusPieChart');
-        if (projectStatusPieChart) {
-            initProjectStatusChart(projectStatusPieChart);
-        }
-
-        const departmentBarChart = document.getElementById('departmentBarChart');
-        if (departmentBarChart) {
-            initDepartmentChart(departmentBarChart);
-        }
-
-        const taskCompletionLineChart = document.getElementById('taskCompletionLineChart');
-        if (taskCompletionLineChart) {
-            initTaskCompletionChart(taskCompletionLineChart);
-        }
-    }
-
-    // Initialize progress bars for employee projects
-    initProjectProgressBars();
+    // Initialize earnings chart if it exists
+    initializeEarningsChart();
     
-    // Todo list functionality - Common for both admin and employee
-    initTodoFunctionality();
-
-    // Function to initialize project progress bars
-    function initProjectProgressBars() {
-        const progressBars = document.querySelectorAll('[id^="projectProgress"]');
-        progressBars.forEach(function(bar) {
-            const progress = parseInt(bar.style.width);
-            
-            // Set color based on progress
-            if (progress < 30) {
-                bar.classList.add('bg-danger');
-            } else if (progress < 60) {
-                bar.classList.add('bg-warning');
-            } else if (progress < 90) {
-                bar.classList.add('bg-info');
-            } else {
-                bar.classList.add('bg-success');
-            }
-        });
-    }
-
-    // Todo list functionality
-    function initTodoFunctionality() {
-        const taskCheckboxes = document.querySelectorAll('.task-checkbox');
-        const deleteTaskButtons = document.querySelectorAll('.delete-task');
-        
-        // Add change event for task checkboxes
-        taskCheckboxes.forEach(checkbox => {
-            checkbox.addEventListener('change', function() {
-                const taskId = this.dataset.taskId;
-                const todoItem = this.closest('.todo-item');
-                
-                if (this.checked) {
-                    // Send AJAX request to update task status
-                    updateTaskStatus(taskId, todoItem);
-                }
-            });
-        });
-        
-        // Add click event for delete buttons
-        deleteTaskButtons.forEach(button => {
-            button.addEventListener('click', function(e) {
-                e.preventDefault();
-                const taskId = this.dataset.taskId;
-                const todoItem = this.closest('.todo-item');
-                
-                if (confirm('Are you sure you want to delete this task?')) {
-                    // Send AJAX request to delete task
-                    deleteTask(taskId, todoItem);
-                }
-            });
-        });
-    }
+    // Initialize project status chart if it exists
+    initializeProjectStatusChart();
     
-    // Function to update task status via AJAX
-    function updateTaskStatus(taskId, todoItem) {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        
-        fetch('/tasks/' + taskId, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({ status: 'Completed' })
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Fade out and remove todo item
-            fadeOutElement(todoItem);
-            
-            // Update task counters if they exist
-            updateTaskCounters();
-        })
-        .catch(error => {
-            console.error('Error updating task:', error);
-            // Uncheck checkbox on error
-            const checkbox = todoItem.querySelector('.task-checkbox');
-            if (checkbox) checkbox.checked = false;
-        });
-    }
+    // Initialize department chart if it exists
+    initializeDepartmentChart();
     
-    // Function to delete task via AJAX
-    function deleteTask(taskId, todoItem) {
-        const csrfToken = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        
-        fetch('/tasks/' + taskId, {
-            method: 'DELETE',
-            headers: {
-                'X-CSRF-TOKEN': csrfToken,
-                'Accept': 'application/json'
-            }
-        })
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.json();
-        })
-        .then(data => {
-            // Fade out and remove todo item
-            fadeOutElement(todoItem);
-            
-            // Update task counters if they exist
-            updateTaskCounters();
-        })
-        .catch(error => {
-            console.error('Error deleting task:', error);
-            alert('Error deleting task. Please try again.');
-        });
-    }
-    
-    // Helper function to fade out element
-    function fadeOutElement(element) {
-        element.style.transition = 'opacity 0.5s';
-        element.style.opacity = '0';
-        
-        setTimeout(() => {
-            element.style.display = 'none';
-            if (element.parentNode) {
-                element.parentNode.removeChild(element);
-            }
-        }, 500);
-    }
-    
-    // Update task counters when tasks change
-    function updateTaskCounters() {
-        // This function can be implemented to update task count displays
-        // after completing or deleting a task
-        const pendingCountElement = document.querySelector('.pending-task-count');
-        const completedCountElement = document.querySelector('.completed-task-count');
-        
-        if (pendingCountElement) {
-            const currentCount = parseInt(pendingCountElement.textContent);
-            if (!isNaN(currentCount)) {
-                pendingCountElement.textContent = currentCount - 1;
-            }
-        }
-        
-        if (completedCountElement) {
-            const currentCount = parseInt(completedCountElement.textContent);
-            if (!isNaN(currentCount)) {
-                completedCountElement.textContent = currentCount + 1;
-            }
-        }
-    }
-
-    // Function to initialize Earnings Chart for Admin
-    function initEarningsChart(chartElement) {
-        const ctx = chartElement.getContext('2d');
-        
-        // Get earnings data from the data attribute if available, or use default data
-        let earningsData = [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000];
-        
-        // Try to get data from a data attribute if it exists
-        const dataContainer = document.getElementById('earnings-data');
-        if (dataContainer && dataContainer.dataset.values) {
-            try {
-                earningsData = JSON.parse(dataContainer.dataset.values);
-            } catch (e) {
-                console.error('Error parsing earnings data:', e);
-            }
-        }
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
-                datasets: [{
-                    label: "Earnings",
-                    lineTension: 0.3,
-                    backgroundColor: "rgba(78, 115, 223, 0.05)",
-                    borderColor: "rgba(78, 115, 223, 1)",
-                    pointRadius: 3,
-                    pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                    pointBorderColor: "rgba(78, 115, 223, 1)",
-                    pointHoverRadius: 3,
-                    pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                    pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-                    pointHitRadius: 10,
-                    pointBorderWidth: 2,
-                    data: earningsData,
-                }],
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                layout: {
-                    padding: {
-                        left: 10,
-                        right: 25,
-                        top: 25,
-                        bottom: 0
-                    }
-                },
-                scales: {
-                    xAxes: [{
-                        time: {
-                            unit: 'date'
-                        },
-                        gridLines: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        ticks: {
-                            maxTicksLimit: 7
-                        }
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            maxTicksLimit: 5,
-                            padding: 10,
-                            callback: function(value, index, values) {
-                                return '$' + number_format(value);
-                            }
-                        },
-                        gridLines: {
-                            color: "rgb(234, 236, 244)",
-                            zeroLineColor: "rgb(234, 236, 244)",
-                            drawBorder: false,
-                            borderDash: [2],
-                            zeroLineBorderDash: [2]
-                        }
-                    }],
-                },
-                tooltips: {
-                    backgroundColor: "rgb(255,255,255)",
-                    bodyFontColor: "#858796",
-                    titleMarginBottom: 10,
-                    titleFontColor: '#6e707e',
-                    titleFontSize: 14,
-                    borderColor: '#dddfeb',
-                    borderWidth: 1,
-                    xPadding: 15,
-                    yPadding: 15,
-                    displayColors: false,
-                    intersect: false,
-                    mode: 'index',
-                    caretPadding: 10,
-                    callbacks: {
-                        label: function(tooltipItem, chart) {
-                            return 'Earnings: $' + number_format(tooltipItem.yLabel);
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Function to initialize Project Status Chart for Admin
-    function initProjectStatusChart(chartElement) {
-        // Get project stats from data attributes if available
-        const dataContainer = document.getElementById('project-stats-data');
-        let projectStats = {};
-        
-        if (dataContainer) {
-            projectStats = {
-                pending: parseInt(dataContainer.dataset.pending || 0),
-                inProgress: parseInt(dataContainer.dataset.inProgress || 0),
-                completed: parseInt(dataContainer.dataset.completed || 0),
-                onHold: parseInt(dataContainer.dataset.onHold || 0),
-                cancelled: parseInt(dataContainer.dataset.cancelled || 0)
-            };
-        }
-        
-        const ctx = chartElement.getContext('2d');
-        new Chart(ctx, {
-            type: 'doughnut',
-            data: {
-                labels: ["Pending", "In Progress", "Completed", "On Hold", "Cancelled"],
-                datasets: [{
-                    data: [
-                        projectStats.pending || 3,
-                        projectStats.inProgress || 5,
-                        projectStats.completed || 8,
-                        projectStats.onHold || 2,
-                        projectStats.cancelled || 1
-                    ],
-                    backgroundColor: ['#f6c23e', '#4e73df', '#1cc88a', '#36b9cc', '#e74a3b'],
-                    hoverBackgroundColor: ['#dda20a', '#2e59d9', '#17a673', '#2c9faf', '#be2617'],
-                    hoverBorderColor: "rgba(234, 236, 244, 1)",
-                }],
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                cutoutPercentage: 80,
-                tooltips: {
-                    backgroundColor: "rgb(255,255,255)",
-                    bodyFontColor: "#858796",
-                    borderColor: '#dddfeb',
-                    borderWidth: 1,
-                    xPadding: 15,
-                    yPadding: 15,
-                    displayColors: false,
-                    caretPadding: 10,
-                    callbacks: {
-                        label: function(tooltipItem, data) {
-                            const label = data.labels[tooltipItem.index];
-                            const value = data.datasets[0].data[tooltipItem.index];
-                            const total = data.datasets[0].data.reduce((a, b) => a + b, 0);
-                            const percentage = Math.round((value / total) * 100);
-                            return `${label}: ${value} (${percentage}%)`;
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Function to initialize Department Chart for Admin
-    function initDepartmentChart(chartElement) {
-        const ctx = chartElement.getContext('2d');
-        
-        // Get department data from the data attributes if available
-        const dataContainer = document.getElementById('department-stats-data');
-        let departmentNames = [];
-        let departmentCounts = [];
-        
-        if (dataContainer) {
-            try {
-                departmentNames = JSON.parse(dataContainer.dataset.names || '[]');
-                departmentCounts = JSON.parse(dataContainer.dataset.counts || '[]');
-            } catch (e) {
-                console.error('Error parsing department data:', e);
-                // Use fallback data
-                departmentNames = ["HR", "IT", "Marketing", "Finance", "Operations"];
-                departmentCounts = [4, 12, 8, 6, 10];
-            }
-        } else {
-            // Fallback data if not available
-            departmentNames = ["HR", "IT", "Marketing", "Finance", "Operations"];
-            departmentCounts = [4, 12, 8, 6, 10];
-        }
-
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: departmentNames,
-                datasets: [{
-                    label: "Staff Count",
-                    backgroundColor: "#4e73df",
-                    hoverBackgroundColor: "#2e59d9",
-                    borderColor: "#4e73df",
-                    data: departmentCounts,
-                }],
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                scales: {
-                    xAxes: [{
-                        gridLines: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        ticks: {
-                            maxTicksLimit: 6
-                        },
-                        maxBarThickness: 25,
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            min: 0,
-                            max: Math.max(...departmentCounts) + 2,
-                            maxTicksLimit: 5,
-                            padding: 10,
-                            callback: function(value) {
-                                return value;
-                            }
-                        },
-                        gridLines: {
-                            color: "rgb(234, 236, 244)",
-                            zeroLineColor: "rgb(234, 236, 244)",
-                            drawBorder: false,
-                            borderDash: [2],
-                            zeroLineBorderDash: [2]
-                        }
-                    }],
-                },
-                tooltips: {
-                    backgroundColor: "rgb(255,255,255)",
-                    bodyFontColor: "#858796",
-                    titleMarginBottom: 10,
-                    titleFontColor: '#6e707e',
-                    titleFontSize: 14,
-                    borderColor: '#dddfeb',
-                    borderWidth: 1,
-                    xPadding: 15,
-                    yPadding: 15,
-                    displayColors: false,
-                    caretPadding: 10,
-                    callbacks: {
-                        label: function(tooltipItem, chart) {
-                            return 'Staff: ' + tooltipItem.yLabel;
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Function to initialize Task Completion Chart for Admin
-    function initTaskCompletionChart(chartElement) {
-        const ctx = chartElement.getContext('2d');
-        
-        // Generate last 6 months labels
-        const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        
-        let taskLabels = [];
-        for (let i = 5; i >= 0; i--) {
-            const monthIndex = (currentMonth - i + 12) % 12;
-            taskLabels.push(months[monthIndex]);
-        }
-        
-        // Get task data from data attributes if available
-        const dataContainer = document.getElementById('task-completion-data');
-        let taskData = [];
-        
-        if (dataContainer) {
-            try {
-                taskData = JSON.parse(dataContainer.dataset.values || '[]');
-            } catch (e) {
-                console.error('Error parsing task completion data:', e);
-                // Use random data as fallback
-                for (let i = 0; i < 6; i++) {
-                    taskData.push(Math.floor(Math.random() * 40) + 10);
-                }
-            }
-        } else {
-            // Generate random data if not available
-            for (let i = 0; i < 6; i++) {
-                taskData.push(Math.floor(Math.random() * 40) + 10);
-            }
-        }
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: taskLabels,
-                datasets: [{
-                    label: "Tasks Completed",
-                    lineTension: 0.3,
-                    backgroundColor: "rgba(28, 200, 138, 0.05)",
-                    borderColor: "rgba(28, 200, 138, 1)",
-                    pointRadius: 3,
-                    pointBackgroundColor: "rgba(28, 200, 138, 1)",
-                    pointBorderColor: "rgba(28, 200, 138, 1)",
-                    pointHoverRadius: 3,
-                    pointHoverBackgroundColor: "rgba(28, 200, 138, 1)",
-                    pointHoverBorderColor: "rgba(28, 200, 138, 1)",
-                    pointHitRadius: 10,
-                    pointBorderWidth: 2,
-                    data: taskData,
-                }],
-            },
-            options: {
-                maintainAspectRatio: false,
-                responsive: true,
-                scales: {
-                    xAxes: [{
-                        gridLines: {
-                            display: false,
-                            drawBorder: false
-                        },
-                        ticks: {
-                            maxTicksLimit: 6
-                        }
-                    }],
-                    yAxes: [{
-                        ticks: {
-                            min: 0,
-                            maxTicksLimit: 5,
-                            padding: 10,
-                            callback: function(value) {
-                                return value;
-                            }
-                        },
-                        gridLines: {
-                            color: "rgb(234, 236, 244)",
-                            zeroLineColor: "rgb(234, 236, 244)",
-                            drawBorder: false,
-                            borderDash: [2],
-                            zeroLineBorderDash: [2]
-                        }
-                    }],
-                },
-                tooltips: {
-                    backgroundColor: "rgb(255,255,255)",
-                    bodyFontColor: "#858796",
-                    titleMarginBottom: 10,
-                    titleFontColor: '#6e707e',
-                    titleFontSize: 14,
-                    borderColor: '#dddfeb',
-                    borderWidth: 1,
-                    xPadding: 15,
-                    yPadding: 15,
-                    displayColors: false,
-                    caretPadding: 10,
-                    callbacks: {
-                        label: function(tooltipItem, chart) {
-                            return tooltipItem.yLabel + ' tasks completed';
-                        }
-                    }
-                }
-            }
-        });
-    }
+    // Initialize task completion chart if it exists
+    initializeTaskCompletionChart();
 });
+
+/**
+ * Initialize the main earnings area chart
+ */
+function initializeEarningsChart() {
+    var earningsChart = document.getElementById('earningsAreaChart');
+    if (!earningsChart) return;
+    
+    var ctx = earningsChart.getContext('2d');
+    
+    // Get earnings data from the element or use default data
+    var earningsData = [];
+    try {
+        var dataElement = document.getElementById('earnings-data');
+        if (dataElement) {
+            earningsData = JSON.parse(dataElement.getAttribute('data-earnings'));
+        } else {
+            // Default data if no element is found
+            earningsData = [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000];
+        }
+    } catch (e) {
+        console.error('Error parsing earnings data:', e);
+        earningsData = [0, 10000, 5000, 15000, 10000, 20000, 15000, 25000, 20000, 30000, 25000, 40000];
+    }
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+            datasets: [{
+                label: "Earnings",
+                lineTension: 0.3,
+                backgroundColor: "rgba(78, 115, 223, 0.05)",
+                borderColor: "rgba(78, 115, 223, 1)",
+                pointRadius: 3,
+                pointBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointBorderColor: "rgba(78, 115, 223, 1)",
+                pointHoverRadius: 3,
+                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
+                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
+                pointHitRadius: 10,
+                pointBorderWidth: 2,
+                data: earningsData,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    time: {
+                        unit: 'month'
+                    },
+                    gridLines: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 12
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        maxTicksLimit: 5,
+                        padding: 10,
+                        // Include a dollar sign in the ticks
+                        callback: function(value, index, values) {
+                            return '$' + number_format(value);
+                        }
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: false,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }],
+            },
+            legend: {
+                display: false
+            },
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                titleMarginBottom: 10,
+                titleFontColor: '#6e707e',
+                titleFontSize: 14,
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                intersect: false,
+                mode: 'index',
+                caretPadding: 10,
+                callbacks: {
+                    label: function(tooltipItem, chart) {
+                        var datasetLabel = chart.datasets[tooltipItem.datasetIndex].label || '';
+                        return datasetLabel + ': $' + number_format(tooltipItem.yLabel);
+                    }
+                }
+            }
+        }
+    });
+}
+
+/**
+ * Initialize the project status pie chart
+ */
+function initializeProjectStatusChart() {
+    var projectStatusCtx = document.getElementById('projectStatusPieChart');
+    if (!projectStatusCtx) return;
+    
+    // Get project status data
+    var pending = 0, inProgress = 0, completed = 0, onHold = 0, cancelled = 0;
+    
+    try {
+        var statsElement = document.getElementById('project-stats-data');
+        if (statsElement) {
+            pending = parseInt(statsElement.getAttribute('data-pending')) || 0;
+            inProgress = parseInt(statsElement.getAttribute('data-in-progress')) || 0;
+            completed = parseInt(statsElement.getAttribute('data-completed')) || 0;
+            onHold = parseInt(statsElement.getAttribute('data-on-hold')) || 0;
+            cancelled = parseInt(statsElement.getAttribute('data-cancelled')) || 0;
+        } else {
+            // Default values
+            pending = 3;
+            inProgress = 5;
+            completed = 8;
+            onHold = 2;
+            cancelled = 1;
+        }
+    } catch (e) {
+        console.error('Error parsing project stats data:', e);
+        // Default values on error
+        pending = 3;
+        inProgress = 5;
+        completed = 8;
+        onHold = 2;
+        cancelled = 1;
+    }
+    
+    new Chart(projectStatusCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ["Pending", "In Progress", "Completed", "On Hold", "Cancelled"],
+            datasets: [{
+                data: [pending, inProgress, completed, onHold, cancelled],
+                backgroundColor: ['#f6c23e', '#4e73df', '#1cc88a', '#36b9cc', '#e74a3b'],
+                hoverBackgroundColor: ['#dda20a', '#2e59d9', '#17a673', '#2c9faf', '#be2617'],
+                hoverBorderColor: "rgba(234, 236, 244, 1)",
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+                callbacks: {
+                    label: function(tooltipItem, data) {
+                        var dataset = data.datasets[tooltipItem.datasetIndex];
+                        var total = dataset.data.reduce(function(previousValue, currentValue) {
+                            return previousValue + currentValue;
+                        });
+                        var currentValue = dataset.data[tooltipItem.index];
+                        var percentage = Math.floor(((currentValue / total) * 100) + 0.5);
+                        return data.labels[tooltipItem.index] + ': ' + currentValue + ' (' + percentage + '%)';
+                    }
+                }
+            },
+            legend: {
+                display: false
+            },
+            cutoutPercentage: 70,
+        },
+    });
+}
+
+/**
+ * Initialize the department bar chart
+ */
+function initializeDepartmentChart() {
+    var departmentBarCtx = document.getElementById('departmentBarChart');
+    if (!departmentBarCtx) return;
+    
+    // Get department data
+    var departmentNames = [];
+    var departmentCounts = [];
+    
+    try {
+        var deptElement = document.getElementById('department-stats-data');
+        if (deptElement) {
+            departmentNames = JSON.parse(deptElement.getAttribute('data-names') || '[]');
+            departmentCounts = JSON.parse(deptElement.getAttribute('data-counts') || '[]');
+        }
+        
+        // If we don't have data, use placeholders
+        if (departmentNames.length === 0 || departmentCounts.length === 0) {
+            departmentNames = ["HR", "IT", "Marketing", "Sales", "Finance"];
+            departmentCounts = [4, 8, 6, 12, 5];
+        }
+    } catch (e) {
+        console.error('Error parsing department data:', e);
+        departmentNames = ["HR", "IT", "Marketing", "Sales", "Finance"];
+        departmentCounts = [4, 8, 6, 12, 5];
+    }
+    
+    new Chart(departmentBarCtx, {
+        type: 'bar',
+        data: {
+            labels: departmentNames,
+            datasets: [{
+                label: "Employees",
+                backgroundColor: "#4e73df",
+                hoverBackgroundColor: "#2e59d9",
+                borderColor: "#4e73df",
+                data: departmentCounts,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    gridLines: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 10
+                    },
+                    maxBarThickness: 25,
+                }],
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        maxTicksLimit: 5,
+                        padding: 10,
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: false,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }],
+            },
+            legend: {
+                display: false
+            },
+            tooltips: {
+                titleMarginBottom: 10,
+                titleFontColor: '#6e707e',
+                titleFontSize: 14,
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                caretPadding: 10,
+            },
+        }
+    });
+}
+
+/**
+ * Initialize the task completion line chart
+ */
+function initializeTaskCompletionChart() {
+    var taskCtx = document.getElementById('taskCompletionLineChart');
+    if (!taskCtx) return;
+    
+    // Generate last 6 months labels
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    
+    let taskLabels = [];
+    for (let i = 5; i >= 0; i--) {
+        const monthIndex = (currentMonth - i + 12) % 12;
+        taskLabels.push(months[monthIndex]);
+    }
+    
+    // Get task data or use random data for demo
+    var taskData = [];
+    try {
+        var taskDataElement = document.getElementById('task-data');
+        if (taskDataElement) {
+            taskData = JSON.parse(taskDataElement.getAttribute('data-tasks'));
+        }
+        
+        // If no data, use random data for demo
+        if (!taskData || taskData.length === 0) {
+            taskData = [15, 22, 19, 27, 30, 25];
+        }
+    } catch (e) {
+        console.error('Error parsing task data:', e);
+        taskData = [15, 22, 19, 27, 30, 25];
+    }
+    
+    new Chart(taskCtx, {
+        type: 'line',
+        data: {
+            labels: taskLabels,
+            datasets: [{
+                label: "Tasks Completed",
+                lineTension: 0.3,
+                backgroundColor: "rgba(28, 200, 138, 0.05)",
+                borderColor: "rgba(28, 200, 138, 1)",
+                pointRadius: 3,
+                pointBackgroundColor: "rgba(28, 200, 138, 1)",
+                pointBorderColor: "rgba(28, 200, 138, 1)",
+                pointHoverRadius: 3,
+                pointHoverBackgroundColor: "rgba(28, 200, 138, 1)",
+                pointHoverBorderColor: "rgba(28, 200, 138, 1)",
+                pointHitRadius: 10,
+                pointBorderWidth: 2,
+                data: taskData,
+            }],
+        },
+        options: {
+            maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    left: 10,
+                    right: 25,
+                    top: 25,
+                    bottom: 0
+                }
+            },
+            scales: {
+                xAxes: [{
+                    time: {
+                        unit: 'month'
+                    },
+                    gridLines: {
+                        display: false,
+                        drawBorder: false
+                    },
+                    ticks: {
+                        maxTicksLimit: 6
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        min: 0,
+                        maxTicksLimit: 5,
+                        padding: 10,
+                    },
+                    gridLines: {
+                        color: "rgb(234, 236, 244)",
+                        zeroLineColor: "rgb(234, 236, 244)",
+                        drawBorder: false,
+                        borderDash: [2],
+                        zeroLineBorderDash: [2]
+                    }
+                }],
+            },
+            legend: {
+                display: false
+            },
+            tooltips: {
+                backgroundColor: "rgb(255,255,255)",
+                bodyFontColor: "#858796",
+                titleMarginBottom: 10,
+                titleFontColor: '#6e707e',
+                titleFontSize: 14,
+                borderColor: '#dddfeb',
+                borderWidth: 1,
+                xPadding: 15,
+                yPadding: 15,
+                displayColors: false,
+                intersect: false,
+                mode: 'index',
+                caretPadding: 10,
+            }
+        }
+    });
+}
+
+/**
+ * Utility function for formatting numbers with commas
+ */
+function number_format(number, decimals, dec_point, thousands_sep) {
+    // Default values
+    decimals = decimals || 0;
+    dec_point = dec_point || '.';
+    thousands_sep = thousands_sep || ',';
+    
+    // Format number
+    number = parseFloat(number);
+    if (isNaN(number)) return '0';
+    
+    number = number.toFixed(decimals);
+    
+    // Split into parts
+    var parts = number.split('.');
+    parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, thousands_sep);
+    
+    return parts.join(dec_point);
+}

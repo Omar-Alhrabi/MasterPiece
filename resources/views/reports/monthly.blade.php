@@ -58,6 +58,59 @@
             height: 300px;
             margin-bottom: 20px;
         }
+
+        /* New styles for the header */
+        .report-brand {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            padding-bottom: 20px;
+            border-bottom: 2px solid #4e73df;
+        }
+
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+
+        .logo {
+            width: 60px;
+            height: 60px;
+            background-color: #4e73df;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: white;
+            font-size: 24px;
+        }
+
+        .brand-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .brand-name {
+            font-weight: 800;
+            font-size: 22px;
+            color: #4e73df;
+            margin: 0;
+        }
+
+        .brand-slogan {
+            font-size: 14px;
+            color: #858796;
+            margin: 0;
+        }
+
+        .report-date {
+            background-color: #f8f9fc;
+            padding: 8px 15px;
+            border-radius: 5px;
+            color: #5a5c69;
+        }
     </style>
 </head>
 
@@ -71,10 +124,26 @@
                 <i class="fas fa-arrow-left"></i> Back to Dashboard
             </a>
         </div>
+
+        <!-- New branded header -->
+        <div class="report-brand">
+            <div class="logo-container">
+                <div class="logo">
+                    <i class="fas fa-laugh-wink"></i>
+                </div>
+                <div class="brand-text">
+                    <h1 class="brand-name ">My Company</h1>
+                    <p class="brand-slogan">Performance Management Solution</p>
+                </div>
+            </div>
+            <div class="report-date">
+                <i class="fas fa-calendar-alt mr-2"></i> Generated on {{ date('F d, Y') }}
+            </div>
+        </div>
+
         <div class="report-header">
             <h1 class="h2 mb-2 text-gray-800">Monthly Performance Report</h1>
             <h2 class="h4 mb-0 text-gray-600">{{ $monthName }} {{ $year }}</h2>
-            <p class="text-muted">Generated on {{ date('F d, Y') }}</p>
 
             <div class="no-print mt-3">
                 <form action="{{ route('report.generate') }}" method="GET" class="form-inline justify-content-center">
@@ -472,12 +541,22 @@
                 </div>
             </div>
         </div>
+
+        <!-- Footer with brand -->
+        <div class="text-center mt-4 mb-5">
+            <div class="text-muted">
+                <small>
+                    <p class="mb-1">My Company | Performance Management Report</p>
+                    <p>© {{ date('Y') }} Your Company. All rights reserved.</p>
+                </small>
+            </div>
+        </div>
     </div>
 
     <script src="{{ asset('vendor/jquery/jquery.min.js') }}"></script>
     <script src="{{ asset('vendor/chart.js/Chart.min.js') }}"></script>
     <script>
-
+        $(document).ready(function() {
             // Project Status chart
             var statusCtx = document.getElementById('projectStatusChart').getContext('2d');
             var statusChart = new Chart(statusCtx, {

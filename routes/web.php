@@ -17,6 +17,7 @@ use App\Http\Controllers\DepartmentController;
 use App\Http\Controllers\JobPositionController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\AdminNotificationController;
+use App\Http\Controllers\MessageController;
 use App\Models\Task;
 use Carbon\Carbon;
 
@@ -162,29 +163,30 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['auth'])->group(function () {
         // Main messaging routes
         Route::prefix('messages')->name('messages.')->group(function () {
-            Route::get('/', [App\Http\Controllers\MessageController::class, 'index'])->name('index');
-            Route::get('/create', [App\Http\Controllers\MessageController::class, 'create'])->name('create');
-            Route::post('/store', [App\Http\Controllers\MessageController::class, 'store'])->name('store');
-            Route::get('/create-group', [App\Http\Controllers\MessageController::class, 'createGroup'])->name('create-group');
-            Route::post('/store-group', [App\Http\Controllers\MessageController::class, 'storeGroup'])->name('store-group');
-            Route::get('/get-unread-count', [App\Http\Controllers\MessageController::class, 'getUnreadCount'])->name('get-unread-count');
-            Route::get('/recent-messages', [App\Http\Controllers\MessageController::class, 'getRecentMessages'])->name('recent');
-            Route::get('/{conversation}', [App\Http\Controllers\MessageController::class, 'show'])->name('show');
-            Route::post('/{conversation}/reply', [App\Http\Controllers\MessageController::class, 'reply'])->name('reply');
+            Route::get('/', [MessageController::class, 'index'])->name('index');
+            Route::get('/create', [MessageController::class, 'create'])->name('create');
+            Route::post('/store', [MessageController::class, 'store'])->name('store');
+            Route::get('/create-group', [MessageController::class, 'createGroup'])->name('create-group');
+            Route::post('/store-group', [MessageController::class, 'storeGroup'])->name('store-group');
+            Route::get('/get-unread-count', [MessageController::class, 'getUnreadCount'])->name('get-unread-count');
+            Route::get('/recent-messages', [MessageController::class, 'getRecentMessages'])->name('recent');
+            Route::get('/{conversation}', [MessageController::class, 'show'])->name('show');
+            Route::post('/{conversation}/reply', [MessageController::class, 'reply'])->name('reply');
+            Route::get('/messages/recent', [MessageController::class, 'getRecentMessages'])->name('messages.recent');
         });
         
         // Message-specific actions
         Route::prefix('message')->name('message.')->group(function () {
-            Route::delete('/{message}', [App\Http\Controllers\MessageController::class, 'destroyMessage'])->name('destroy');
-            Route::put('/{message}/mark-read', [App\Http\Controllers\MessageController::class, 'markAsRead'])->name('mark-read');
+            Route::delete('/{message}', [MessageController::class, 'destroyMessage'])->name('destroy');
+            Route::put('/{message}/mark-read', [MessageController::class, 'markAsRead'])->name('mark-read');
         });
         
         // Conversation management
         Route::prefix('conversation')->name('conversation.')->group(function () {
-            Route::get('/{conversation}/users', [App\Http\Controllers\MessageController::class, 'getConversationUsers'])->name('users');
-            Route::post('/{conversation}/add-user', [App\Http\Controllers\MessageController::class, 'addUserToConversation'])->name('add-user');
-            Route::delete('/{conversation}/remove-user/{user}', [App\Http\Controllers\MessageController::class, 'removeUserFromConversation'])->name('remove-user');
-            Route::delete('/{conversation}', [App\Http\Controllers\MessageController::class, 'destroyConversation'])->name('destroy');
+            Route::get('/{conversation}/users', [MessageController::class, 'getConversationUsers'])->name('users');
+            Route::post('/{conversation}/add-user', [MessageController::class, 'addUserToConversation'])->name('add-user');
+            Route::delete('/{conversation}/remove-user/{user}', [MessageController::class, 'removeUserFromConversation'])->name('remove-user');
+            Route::delete('/{conversation}', [MessageController::class, 'destroyConversation'])->name('destroy');
         });
     });
 });

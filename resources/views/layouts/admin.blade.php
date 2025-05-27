@@ -7,6 +7,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="description" content="">
     <meta name="author" content="">
+    <meta name="theme-color" content="#06c1db">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <link rel="icon" href="{{ asset('image/favicon.png') }}" type="image/png">
 
@@ -36,7 +37,7 @@
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-laugh-wink"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">HR System</div>
+                <div class="sidebar-brand-text mx-3">Enterprise 360</div>
             </a>
 
             <!-- Divider -->
@@ -122,7 +123,7 @@
                             <i class="fas fa-chart-bar fa-sm"></i> payroll reports
                         </a>
                         <a class="collapse-item {{ request()->routeIs('payroll.create') ? 'active' : '' }}" href="{{ route('payroll.create') }}">
-                            <i class="fas fa-plus fa-sm"></i> Add a new salary
+                            <i class="fas fa-plus fa-sm"></i> Create new salary
                         </a>
                     </div>
                 </div>
@@ -220,7 +221,7 @@
                     <div class="bg-white py-2 collapse-inner rounded">
                         <h6 class="collapse-header">Task Management:</h6>
                         <a class="collapse-item {{ request()->routeIs('tasks.index') ? 'active' : '' }}" href="{{ route('tasks.index') }}">All Tasks</a>
-                        <a class="collapse-item {{ request()->routeIs('tasks.create') ? 'active' : '' }}" href="{{ route('tasks.create') }}">Add New Task</a>
+                        <a class="collapse-item {{ request()->routeIs('tasks.create') ? 'active' : '' }}" href="{{ route('tasks.create') }}">Create New Task</a>
                     </div>
                 </div>
             </li>
@@ -230,7 +231,7 @@
                 <a class="nav-link" href="{{ route('messages.index') }}">
                     <i class="fas fa-envelope fa-fw"></i>
                     <span>Messages</span>
-                    <span class="badge badge-danger badge-counter message-count" id="message-unread-count"></span>
+                    <span class="badge badge-danger badge-counter message-count point" id="message-unread-count" style="padding: 7px; position: absolute; top: 30px;"></span>
                 </a>
             </li>
             <!-- permissions Management -->
@@ -705,63 +706,40 @@
                     type: 'GET',
                     dataType: 'json',
                     success: function(data) {
-                        // Update message counts
                         let count = data.count;
                         let countDisplay = count > 0 ? (count > 99 ? '99+' : count) : '';
                         $('.message-count').text(countDisplay);
 
-                        // Load recent messages for dropdown preview
-                        if (count > 0) {
-                            $.ajax({
-                                url: "{{ route('messages.index') }}",
-                                type: 'GET',
-                                dataType: 'html',
-                                success: function(html) {
-                                    // Extract recent conversations
-                                    const tempDiv = document.createElement('div');
-                                    tempDiv.innerHTML = html;
-
-                                    const conversations = $(tempDiv).find('.list-group-item').slice(0, 3);
-                                    let previewHtml = '';
-
-                                    if (conversations.length > 0) {
-                                        conversations.each(function() {
-                                            const href = $(this).attr('href');
-                                            const avatar = $(this).find('.avatar-circle').prop('outerHTML');
-                                            const name = $(this).find('h6').text().trim();
-                                            const message = $(this).find('p').text().trim();
-
-                                            previewHtml += `
-                                            <a class="dropdown-item d-flex align-items-center" href="${href}">
-                                                <div class="dropdown-list-image mr-3">
-                                                    ${avatar}
-                                                </div>
-                                                <div>
-                                                    <div class="text-truncate">${message}</div>
-                                                    <div class="small text-gray-500">${name}</div>
-                                                </div>
-                                            </a>
-                                        `;
-                                        });
-                                    } else {
-                                        previewHtml = '<div class="dropdown-item text-center">No new messages</div>';
-                                    }
-
-                                    $('#message-preview-container').html(previewHtml);
+                        $.ajax({
+                            url: "{{ route('messages.recent') }}",
+                            type: 'GET',
+                            dataType: 'json',
+                            success: function(response) {
+                                if (response.html) {
+                                    $('#message-preview-container').html(response.html);
+                                } else {
+                                    $('#message-preview-container').html('<div class="dropdown-item text-center">No new messages</div>');
                                 }
-                            });
-                        } else {
-                            $('#message-preview-container').html('<div class="dropdown-item text-center">No new messages</div>');
-                        }
+                            },
+                            error: function() {
+                                $('#message-preview-container').html('<div class="dropdown-item text-center">Error loading messages</div>');
+                            }
+                        });
+                    },
+                    error: function() {
+                        $('.message-count').text('');
+                        $('#message-preview-container').html('<div class="dropdown-item text-center">Error loading messages</div>');
                     }
                 });
             }
 
-            // Initial update
             updateMessages();
 
-            // Update messages every 30 seconds
             setInterval(updateMessages, 30000);
+
+            $('#messagesDropdown').on('click', function() {
+                updateMessages();
+            });
         });
     </script>
     @endpush
